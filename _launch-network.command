@@ -15,6 +15,6 @@ echo "### launching network          ###"
 echo "##################################"
 echo ""
 
-cd dns
+cd network
 
 ./DNS_run.command
