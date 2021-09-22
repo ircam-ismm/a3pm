@@ -1,0 +1,16 @@
+{
+  name: 'A³PM',
+  author: '',
+
+  clients: {
+    player: {
+      target: 'browser',
+      default: true
+    },
+    controller: {
+      target: 'browser',
+    },
+  },
+
+  project: 'test-triangle',
+}
