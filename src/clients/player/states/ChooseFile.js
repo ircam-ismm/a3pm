@@ -30,9 +30,9 @@ export default class ChooseFile extends State {
     }
   }
 
-  async exit() {
+  // async exit() {
 
-  }
+  // }
 
   render() {
     // @note - only in DEBUG mode

@@ -28,4 +28,5 @@ _resources
 /network/dnsmasq.leases
 
 projects
-!projects/test-*
+!projects/test-slider
+!projects/test-triangle

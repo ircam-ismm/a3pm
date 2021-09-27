@@ -18,7 +18,7 @@ export default class AnnotateSlider extends AnnotateBase {
   constructor(name, context) {
     super(name, context);
 
-    this.position = 0.5;
+    this.position = 0;
   }
 
   recordPosition(value) {
