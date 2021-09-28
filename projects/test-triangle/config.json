@@ -1,0 +1,9 @@
+{
+  name: 'my test slider project',
+  annotationType: 'slider',
+  mediaType: 'audio',
+  tags: [
+    // ['très', 'peu'],
+    ['peu', 'très'],
+  ]
+}
