@@ -6,8 +6,8 @@ export default class End extends State {
     const { name, annotatedRecordings } = this.context.participant.getValues();
     const now = new Date().toString();
 
-    this.overviewLogger.write(`${now} - ${name} - finished: ${annotatedRecordings}`);
-    this.metasLogger.write(`${now} - end - annotatedRecordings: ${annotatedRecordings}`);
+    this.context.overviewLogger.write(`${now} - ${name} - finished: ${annotatedRecordings}`);
+    this.context.metasLogger.write(`${now} - end - annotatedRecordings: ${annotatedRecordings}`);
 
     setTimeout(() => window.location.reload(true), 8000);
   }

@@ -20,7 +20,7 @@ export default class ChooseFile extends State {
 
       if (remainingRecordings.length === 0) {
         // we don't want to await here as the exit would never be called
-        this.context.participant.set({ state: 'thanks' });
+        this.context.participant.set({ state: 'end' });
       } else {
         // pick a random recording
         const index = Math.floor(Math.random() * remainingRecordings.length);
