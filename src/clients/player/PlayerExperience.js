@@ -4,7 +4,7 @@ import renderInitializationScreens from '@soundworks/template-helpers/client/ren
 
 import StateMachine from './states/StateMachine.js';
 
-window.DEBUG = true;
+window.DEBUG = false;
 window.SILENCE = 'audio/silence-4s.wav';
 
 class PlayerExperience extends AbstractExperience {
@@ -63,7 +63,6 @@ class PlayerExperience extends AbstractExperience {
           state = updates.state;
         }
 
-        console.log(state);
         this.stateMachine.setState(state);
       }
 
@@ -97,10 +96,10 @@ class PlayerExperience extends AbstractExperience {
         });
         // mock meta logger
       }
+
       document.addEventListener('click', testAnnotationPage);
     } else {
       // default state machine initialization
-      console.log('heho', this.participant.getValues());
       this.participant.set({ state: 'configure-name' });
     }
 
@@ -112,18 +111,19 @@ class PlayerExperience extends AbstractExperience {
 
   render() {
     render(html`
-      <h1 style="margin: 0; padding: 20px; background-color: #232323;">
+      <h1 class="header">
         ${this.config.app.name} - ${this.project.get('name')}
-        ${this.participant.get('name') ?
-          html`<span style="position: absolute; top: 20px; right: 20px">[${this.participant.get('name')}]</span>` :
-          nothing
-        }
       </h1>
-      <div style="padding: 20px">
+      <div class="main">
         ${this.stateMachine.state ?
           this.stateMachine.state.render() :
           nothing
-        }</div>
+        }
+      </div>
+      ${this.participant.get('name') ?
+        html`<span class="username">[${this.participant.get('name')}]</span>` :
+        nothing
+      }
     `, this.$container);
   }
 }

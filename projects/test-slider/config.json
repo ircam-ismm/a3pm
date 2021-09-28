@@ -1,9 +1,9 @@
 {
-  name: 'my test slider project',
+  name: 'Annotation de la tension expressive',
   annotationType: 'slider',
   mediaType: 'audio',
   tags: [
-    // ['très', 'peu'],
-    ['peu', 'très'],
+
+    ['pas de tension', 'très forte tension'],
   ]
 }

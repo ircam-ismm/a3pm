@@ -13,14 +13,15 @@ export default class ConfigureTags extends State {
     // if the participant has relaunched and we already have a tagsOrder
     // do not override the recorded value
     if (this.context.participant.get('tagsOrder')) {
-      console.log('found tags order, bypass choice', this.context.participant.get('tagsOrder'));
+      console.log('+ reconnecting client, bypass tag choice', this.context.participant.get('tagsOrder'));
       this.context.participant.set({ state: 'choose-file' });
     }
 
-    // if we only have 1 tag list, just use it
     const tags = this.context.project.get('tags');
 
+    // if we only have 1 tag list, just use it
     if (tags.length === 1) {
+      console.log('+ only 1 tag choice, bypass choice', tags[0]);
       this.setTagsOrder(tags[0]);
     }
   }

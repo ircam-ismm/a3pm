@@ -19,20 +19,17 @@ export default class ChooseFile extends State {
       });
 
       if (remainingRecordings.length === 0) {
-        await this.context.participant.set({ state: 'thanks' });
+        // we don't want to await here as the exit would never be called
+        this.context.participant.set({ state: 'thanks' });
       } else {
         // pick a random recording
         const index = Math.floor(Math.random() * remainingRecordings.length);
         const recording = remainingRecordings[index];
-
-        await this.setRecording(recording);
+        // we don't want to await here as the exit would never be called
+        this.setRecording(recording);
       }
     }
   }
-
-  // async exit() {
-
-  // }
 
   render() {
     // @note - only in DEBUG mode
