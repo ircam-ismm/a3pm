@@ -55,8 +55,9 @@ body.loading {
 }
 
 p {
-  line-height: 30px;
-  font-size: 16px;
+  line-height: 20px;
+  font-size: 1.4rem;
+  margin: 10px 0;
 }
 
 button, input {
@@ -99,7 +100,6 @@ button {
 
 .main {
   padding: 0 20px;
-  position: relative;
 }
 
 .username {
