@@ -1,0 +1,9 @@
+{
+  name: 'Annotation de la tension expressive',
+  annotationType: 'slider',
+  mediaType: 'audio',
+  tags: [
+
+    ['pas de tension', 'très forte tension'],
+  ]
+}

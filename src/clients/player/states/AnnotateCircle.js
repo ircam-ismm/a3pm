@@ -1,15 +1,7 @@
 import AnnotateBase from './AnnotateBase.js';
 import { html } from 'lit-html';
 
-function getAreaSize() {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-  const size = Math.min(width, height) * 0.7;
-  const top = (height - size) / 2 + 60; // 60 is the header
-  const left = (width - size) / 2;
-
-  return { size, left, top };
-}
+import { getCircleArea } from '../utils/annotation-area-position.js';
 
 export default class AnnotateCircle extends AnnotateBase {
   constructor(name, context) {
@@ -36,7 +28,7 @@ export default class AnnotateCircle extends AnnotateBase {
     if (this.active) {
       const event = (e.type === 'touchmove' || e.type === 'touchstart') ? e.touches[0] : e;
 
-      const { size, left, top } = getAreaSize();
+      const { size, left, top } = getCircleArea();
       const relX = event.clientX - left;
       const relY = event.clientY - top;
 
@@ -96,8 +88,11 @@ export default class AnnotateCircle extends AnnotateBase {
     await super.exit();
   }
 
+  /**
+   * @todo - un-hardcode triangle
+   */
   render() {
-    const { size, left, top } = getAreaSize();
+    const { size, left, top } = getCircleArea();
     const { recording, tagsOrder } = this.context.participant.getValues();
 
     const view = html`
@@ -115,38 +110,34 @@ export default class AnnotateCircle extends AnnotateBase {
       >
         <!-- legend -->
         <!-- top -->
-        <p
+        <span
           style="
-            font-size: 20px;
-            width: 120px;
+            width: ${size}px;
+            font-size: 1.2rem;
             text-align: center;
             position: absolute;
-            top: -60px;
-            left: ${size / 2 - 60}px;
+            top: -20px;
           "
-        >${tagsOrder[0]}</p>
+        >${tagsOrder[0]}</span>
         <!-- bottom right -->
-        <p
+        <span
           style="
-            font-size: 20px;
-            width: 120px;
-            text-align: center;
+            font-size: 1.2rem;
             position: absolute;
-            top: ${size  * 2 / 3 + 30}px;
-            left: ${size - 30}px;
+            bottom: ${size * ((1 - Math.sin(Math.PI / 6)) / 2)}px;
+            left: ${size}px;
           "
-        >${tagsOrder[1]}</p>
+        >${tagsOrder[1]}</span>
         <!-- bottom left -->
-        <p
+        <span
           style="
-            font-size: 20px;
-            width: 120px;
+            font-size: 1.2rem;
             text-align: center;
             position: absolute;
-            top: ${size  * 2 / 3 + 30}px;
-            left: ${-120 + 30}px;
+            bottom: ${size * ((1 - Math.sin(Math.PI / 6)) / 2)}px;
+            right: ${size}px;
           "
-        >${tagsOrder[2]}</p>
+        >${tagsOrder[2]}</span>
 
         <!-- inner circle -->
         <div style="
@@ -156,7 +147,7 @@ export default class AnnotateCircle extends AnnotateBase {
           top: 0;
           left: 0;
           border-radius: 50%;
-          background: url(./images/bg.png) 50% 50% no-repeat;
+          background: url(./images/triangle-bg.png) 50% 50% no-repeat;
           background-size: 100% 100%;
         "></div>
 

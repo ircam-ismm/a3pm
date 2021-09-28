@@ -12,8 +12,8 @@ short description
 
 ## Todos
 
-- dns
-- launch scripts
+- fix DEBUG=false bugs
+- improve layout for phones
 
 ## Credits
 

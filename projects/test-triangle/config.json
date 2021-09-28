@@ -1,0 +1,13 @@
+{
+  name: 'my test triangle project',
+  annotationType: 'triangle',
+  mediaType: 'audio',
+  tags: [
+    ['sans', 'avec', 'contre'],
+    ['sans', 'contre', 'avec'],
+    ['avec', 'contre', 'sans'],
+    ['avec', 'sans', 'contre'],
+    ['contre', 'avec', 'sans'],
+    ['contre', 'sans', 'avec'],
+  ]
+}

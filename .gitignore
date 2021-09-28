@@ -27,5 +27,6 @@ _resources
 /network/log/
 /network/dnsmasq.leases
 
-projects
-!projects/test-*
+/projects/*
+!/projects/test-*
+/projects/*/measures
