@@ -7,6 +7,6 @@ else
   dir="$(dirname "$0")"
 fi
 
-cd $dir
+cd "$dir"
 
 ENV=prod node "./.build/server/index.js"

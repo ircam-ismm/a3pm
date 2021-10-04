@@ -7,26 +7,26 @@ else
   dir="$(dirname "$0")"
 fi
 
-cd $dir
+cd "$dir"
 
-echo ""
-echo "##################################"
-echo "### install command line tools ###"
-echo "##################################"
-echo ""
+# echo ""
+# echo "##################################"
+# echo "### install command line tools ###"
+# echo "##################################"
+# echo ""
 
-xcode-select --install
+# xcode-select --install
 
-echo ""
-echo "##################################"
-echo "### install network utilities  ###"
-echo "##################################"
-echo ""
+# echo ""
+# echo "##################################"
+# echo "### install network utilities  ###"
+# echo "##################################"
+# echo ""
 
-git submodule add https://github.com/imp/dnsmasq.git network/dnsmasq
-./network/init_dependencies.bash
+# git submodule add https://github.com/imp/dnsmasq.git network/dnsmasq
+# ./network/init_dependencies.bash
 
-cd $dir
+# cd $dir
 
 echo ""
 echo "##################################"
