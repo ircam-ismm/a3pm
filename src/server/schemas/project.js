@@ -19,6 +19,10 @@ export default {
     default: null,
     nullable: true,
   },
+  language: {
+    type: 'string',
+    default: 'fr',
+  },
   tags: {
     type: 'any',
     default: null,

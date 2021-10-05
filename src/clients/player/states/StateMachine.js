@@ -29,6 +29,7 @@ class StateMachine {
 
     if (this.state !== null) {
       console.log(`> exit ${this.state.name}`);
+      this.state.status = 'exited';
       await this.state.exit();
       this.state = null;
       this.context.render();
@@ -39,7 +40,9 @@ class StateMachine {
 
     console.log(`> enter ${name}`);
     await state.enter();
+    state.status = 'entered';
     this.state = state;
+
     this.context.render();
   }
 }

@@ -25,6 +25,11 @@ export default class AnnotateCircle extends AnnotateBase {
   }
 
   onInteractionMove(e) {
+    // don't try to access loggers when they are closed
+    if (this.status !== 'entered') {
+      return;
+    }
+
     if (this.active) {
       const event = (e.type === 'touchmove' || e.type === 'touchstart') ? e.touches[0] : e;
 
@@ -96,7 +101,7 @@ export default class AnnotateCircle extends AnnotateBase {
     const { recording, tagsOrder } = this.context.participant.getValues();
 
     const view = html`
-      <p>Annotating "${recording}"</p>
+      <p>${this.texts.title} "${recording}"</p>
 
       <div style="
         position: absolute;

@@ -37,7 +37,7 @@ export default class ChooseFile extends State {
     const recordingsOverview = audioFiles.children.map(leaf => leaf.url);
 
     return html`
-      <p>Choose the recording to annotate:</p>
+      <p>${this.texts.title}</p>
       ${recordingsOverview.map(recording => {
         return html`
           <button

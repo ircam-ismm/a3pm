@@ -62,11 +62,11 @@ export default class ConfigureName extends State {
 
   render() {
     return html`
-      <p>Participant name:</p>
+      <p>${this.texts.title}</p>
       <input type="text" />
       <button
         @click="${e => this.setName(e.target.previousElementSibling.value)}"
-      >Submit</button>
+      >${this.texts.btn}</button>
     `;
   }
 }

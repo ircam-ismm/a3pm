@@ -10,10 +10,10 @@ export default class AnnotateIdle extends State {
     return html`
       <p
         style="margin-bottom: 30px"
-      >Recording: ${this.context.participant.get('recording')}</p>
+      >${this.texts.title} ${this.context.participant.get('recording')}</p>
       <button
         @click="${e => this.startAnnotation()}"
-      >start annotation</button>
+      >${this.texts.btn}</button>
     `
   }
 }

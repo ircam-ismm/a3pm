@@ -12,6 +12,11 @@ export default class AnnotateSlider extends AnnotateBase {
   }
 
   recordPosition(value) {
+    // don't try to access loggers when they are closed
+    if (this.status !== 'entered') {
+      return;
+    }
+
     this.position = value;
 
     const data = {
@@ -29,7 +34,7 @@ export default class AnnotateSlider extends AnnotateBase {
     const { size, left, top } = getSliderArea(sliderHeight);
 
     const view = html`
-      <p>Annotating "${recording}"</p>
+      <p>${this.texts.title} "${recording}"</p>
 
       <span
         style="position: absolute; top: ${top - 30}px; left: ${left}px; font-size: 1.2rem"

@@ -3,6 +3,7 @@ import { render, html, nothing } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
 
 import StateMachine from './states/StateMachine.js';
+import i18n from './i18n/index.js';
 
 window.DEBUG = false;
 window.SILENCE = 'audio/silence-4s.wav';
@@ -76,6 +77,10 @@ class PlayerExperience extends AbstractExperience {
       }
     });
 
+
+    this.texts = i18n[this.project.get('language')];
+    console.log(this.texts);
+
     const FORCE_ANNOTATION = false;
 
     if (FORCE_ANNOTATION) {
@@ -101,6 +106,7 @@ class PlayerExperience extends AbstractExperience {
     } else {
       // default state machine initialization
       this.participant.set({ state: 'configure-name' });
+      // this.participant.set({ state: 'end' });
     }
 
 

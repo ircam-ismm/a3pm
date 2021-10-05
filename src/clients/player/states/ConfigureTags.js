@@ -36,11 +36,18 @@ export default class ConfigureTags extends State {
 
   render() {
     const tags = this.context.project.get('tags');
+    const annotationType = this.context.project.get('annotationType');
+    let title = null;
+
+    if (annotationType === 'slider') {
+      title = this.texts.titleSlider;
+    } else if (annotationType === 'triangle') {
+      title = this.texts.titleTriangle;
+    }
 
     return html`
       <div class="screen">
-        <!-- @todo : handle 2d and 3d -->
-        <p>Choose tags order (top, bottom-right, bottom-left):</p>
+        <p>${title}</p>
         ${tags.map(tagItems => {
           return html`
             <button
