@@ -9,7 +9,7 @@ else
   dir="$(dirname "$0")"
 fi
 
-cd $dir
+cd "$dir"
 
 echo ""
 echo "##################################"
