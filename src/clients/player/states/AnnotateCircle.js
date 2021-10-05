@@ -100,8 +100,15 @@ export default class AnnotateCircle extends AnnotateBase {
     const { size, left, top } = getCircleArea();
     const { recording, tagsOrder } = this.context.participant.getValues();
 
+    const testing = this.context.participant.get('testing');
+    let title = `${this.texts.title} "${recording}"`;
+
+    if (testing) {
+      title = `[test] ${title}`;
+    }
+
     const view = html`
-      <p>${this.texts.title} "${recording}"</p>
+      <p>${title}"</p>
 
       <div style="
         position: absolute;

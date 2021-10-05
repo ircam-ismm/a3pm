@@ -15,10 +15,14 @@ export default class AnnotateBase extends State {
     const { name, recording, folder } = this.context.participant.getValues();
     const now = new Date().toString();
 
-    this.context.overviewLogger.write(`[${now}] - ${name} - recording: ${recording}`);
-    this.context.metasLogger.write(`[${now}] - recording: ${recording}`);
+    const testing = this.context.participant.get('testing');
 
-    const filename = `${folder}/${name}_${basename(recording)}.txt`;
+    this.context.overviewLogger.write(`[${now}] - ${name} - recording: ${recording} (test: ${testing})`);
+    this.context.metasLogger.write(`[${now}] - recording: ${recording} (test: ${testing})`);
+
+    let filename = testing ?
+      `${folder}/${name}_${basename(recording)}-test.txt` :
+      `${folder}/${name}_${basename(recording)}.txt`;
 
     this.context.annotationLogger = await this.context.logger.create(filename, {
       bufferSize: 200,
@@ -43,14 +47,23 @@ export default class AnnotateBase extends State {
     this.context.$mediaPlayer.pause();
     this.context.$mediaPlayer.src = window.SILENCE;
 
-    const {
-      annotatedRecordings,
-      recording
-    } = this.context.participant.getValues();
+    const testing = this.context.participant.get('testing');
 
-    annotatedRecordings.push(recording);
+    if (testing) {
+      await this.context.participant.set({
+        testing: false,
+        testDone: true,
+      });
+    } else {
+      const {
+        annotatedRecordings,
+        recording
+      } = this.context.participant.getValues();
 
-    await this.context.participant.set({ annotatedRecordings });
+      annotatedRecordings.push(recording);
+
+      await this.context.participant.set({ annotatedRecordings });
+    }
   }
 
   render(childView) {

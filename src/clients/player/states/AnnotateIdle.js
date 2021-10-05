@@ -7,10 +7,17 @@ export default class AnnotateIdle extends State {
   }
 
   render() {
+    const testing = this.context.participant.get('testing');
+    let title = `${this.texts.title} ${this.context.participant.get('recording')}`;
+
+    if (testing) {
+      title = `[test] ${title}`;
+    }
+
     return html`
       <p
         style="margin-bottom: 30px"
-      >${this.texts.title} ${this.context.participant.get('recording')}</p>
+      >${title}</p>
       <button
         @click="${e => this.startAnnotation()}"
       >${this.texts.btn}</button>

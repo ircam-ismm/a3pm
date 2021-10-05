@@ -33,8 +33,15 @@ export default class AnnotateSlider extends AnnotateBase {
     const { recording, tagsOrder } = this.context.participant.getValues();
     const { size, left, top } = getSliderArea(sliderHeight);
 
+    const testing = this.context.participant.get('testing');
+    let title = `${this.texts.title} "${recording}"`;
+
+    if (testing) {
+      title = `[test] ${title}`;
+    }
+
     const view = html`
-      <p>${this.texts.title} "${recording}"</p>
+      <p>${title}</p>
 
       <span
         style="position: absolute; top: ${top - 30}px; left: ${left}px; font-size: 1.2rem"

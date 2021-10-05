@@ -79,7 +79,6 @@ class PlayerExperience extends AbstractExperience {
 
 
     this.texts = i18n[this.project.get('language')];
-    console.log(this.texts);
 
     const FORCE_ANNOTATION = false;
 

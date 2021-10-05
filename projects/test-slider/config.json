@@ -4,7 +4,7 @@
   mediaType: 'audio',
   language: 'fr',
   tags: [
-
     ['pas de tension', 'très forte tension'],
-  ]
+  ],
+  testRecording: 'test.wav',
 }

@@ -140,11 +140,12 @@ server.stateManager.registerSchema('participant', participantSchema);
             'name' in updates ||
             'folder' in updates ||
             'tagsOrder' in updates ||
-            'annotatedRecordings' in updates
+            'annotatedRecordings' in updates ||
+            'testDone' in updates
           ) {
             const index = participantStates.findIndex(s => s.name === participant.get('name'));
-            const { name, folder, tagsOrder, annotatedRecordings } = participant.getValues();
-            const values = { name, folder, tagsOrder, annotatedRecordings };
+            const { name, folder, tagsOrder, annotatedRecordings, testDone } = participant.getValues();
+            const values = { name, folder, tagsOrder, annotatedRecordings, testDone };
 
             if (index !== -1) {
               participantStates[index] = values;

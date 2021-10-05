@@ -1,23 +1,23 @@
 export default {
   name: {
     type: 'string',
-    default: null,
     nullable: true,
+    default: null,
   },
   folder: {
     type: 'string',
-    default: null,
     nullable: true,
+    default: null,
   },
   mediaType: {
     type: 'string',
-    default: null,
     nullable: true,
+    default: null,
   },
   annotationType: {
     type: 'string',
-    default: null,
     nullable: true,
+    default: null,
   },
   language: {
     type: 'string',
@@ -25,7 +25,12 @@ export default {
   },
   tags: {
     type: 'any',
-    default: null,
     nullable: true,
+    default: null,
+  },
+  testRecording: {
+    type: 'string',
+    nullable: true,
+    default: null,
   },
 }
