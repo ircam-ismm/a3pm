@@ -23,6 +23,10 @@ export default {
     type: 'string',
     default: 'fr',
   },
+  instruction: {
+    type: 'string',
+    default: '',
+  },
   tags: {
     type: 'any',
     nullable: true,

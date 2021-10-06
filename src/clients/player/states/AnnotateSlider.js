@@ -42,6 +42,9 @@ export default class AnnotateSlider extends AnnotateBase {
 
     const view = html`
       <p>${title}</p>
+      <p style="font-size: 12px; line-height: 14px;">
+        ${this.context.project.get('instruction')}
+      </p>
 
       <span
         style="position: absolute; top: ${top - 30}px; left: ${left}px; font-size: 1.2rem"
