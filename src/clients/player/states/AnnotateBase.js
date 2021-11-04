@@ -32,9 +32,9 @@ export default class AnnotateBase extends State {
     this.context.$mediaPlayer.src = recording;
     this.context.$mediaPlayer.pause();
 
-    // this.context.$mediaPlayer.addEventListener('ended', () => {
-    //   this.context.participant.set({ state: 'choose-file' });
-    // });
+    this.context.$mediaPlayer.addEventListener('ended', () => {
+      this.context.participant.set({ state: 'choose-file' });
+    });
 
     setTimeout(() => {
       this.context.$mediaPlayer.play();
