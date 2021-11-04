@@ -53,6 +53,9 @@ class PlayerExperience extends AbstractExperience {
             case 'triangle':
               state = 'annotate-circle';
               break;
+            case 'square':
+              state = 'annotate-square';
+              break;
             case 'slider':
               state = 'annotate-slider';
               break;
@@ -87,7 +90,9 @@ class PlayerExperience extends AbstractExperience {
       const testAnnotationPage = async () => {
         document.removeEventListener('click', testAnnotationPage);
 
-        const audioFiles = this.fileSystem.get('medias');
+        const completedTasks = this.participant.get('completedTasks');
+        const audioFilesPath = this.project.get('mediaFolder')[completedTasks];
+        const audioFiles = this.fileSystem.get(audioFilesPath);
         const recordings = audioFiles.children.map(leaf => leaf.url);
         this.metasLogger = { write: (msg) => console.log(msg) };
         // test-triangle project
@@ -95,7 +100,7 @@ class PlayerExperience extends AbstractExperience {
           name: 'test-user',
           folder: 'test-user-42',
           recording: recordings[0],
-          tagsOrder: this.project.get('tags')[0],
+          tagsOrder: this.project.get('tags')[completedTasks][0],
           state: 'annotate',
         });
         // mock meta logger

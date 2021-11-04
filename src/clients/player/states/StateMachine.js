@@ -4,6 +4,7 @@ import ChooseFile from './ChooseFile.js';
 import AnnotateIdle from './AnnotateIdle.js';
 import AnnotateSlider from './AnnotateSlider.js';
 import AnnotateCircle from './AnnotateCircle.js';
+import AnnotateSquare from './AnnotateSquare.js';
 import End from './End.js';
 
 const states = {
@@ -13,6 +14,7 @@ const states = {
   'annotate-idle': AnnotateIdle,
   'annotate-slider': AnnotateSlider,
   'annotate-circle': AnnotateCircle,
+  'annotate-square': AnnotateSquare,
   'end': End,
 };
 

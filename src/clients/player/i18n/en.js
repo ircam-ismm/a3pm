@@ -5,6 +5,7 @@ export default {
   },
   'configure-tags': {
     titleTriangle: 'Choose tags order (top, bottom-right, bottom-left):',
+    titleSquare: 'Choose tags order (top, right, bottom, left):',
     titleSlider: 'Choose tags order (left, right):',
   },
   'choose-file': {
@@ -18,6 +19,9 @@ export default {
     title: 'Annotating',
   },
   'annotate-circle': {
+    title: 'Annotating',
+  },
+  'annotate-square': {
     title: 'Annotating',
   },
   'end': {

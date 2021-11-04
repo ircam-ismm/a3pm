@@ -9,5 +9,6 @@
     ['avec', 'sans', 'contre'],
     ['contre', 'avec', 'sans'],
     ['contre', 'sans', 'avec'],
-  ]
+  ],
+  testRecording: 'test.wav',
 }

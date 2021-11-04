@@ -11,20 +11,20 @@ export default class ChooseFile extends State {
 
   async enter() {
     if (!window.DEBUG) {
-      const audioFiles = this.context.fileSystem.get('medias');
+      const completedTasks = this.context.participant.get('completedTasks');
+      const audioFilesPath = this.project.get('mediaFolder')[completedTasks];
+      const audioFiles = this.context.fileSystem.get(audioFilesPath);
       const recordingsOverview = audioFiles.children
         .filter(leaf => leaf.name !== this.context.project.get('testRecording'))
-        .map(leaf => leaf.url);
+        .map(leaf => leaf.url); 
       const annotatedRecordings = this.context.participant.get('annotatedRecordings');
       const remainingRecordings = recordingsOverview.filter(recording => {
         return !annotatedRecordings.includes(recording);
       });
 
       const testRecording = audioFiles.children
-        .find(leaf => leaf.name === this.context.project.get('testRecording'))
-        .url;
-
-      console.log(remainingRecordings, testRecording);
+        .find(leaf => leaf.name === this.context.project.get('testRecording')[completedTasks])
+        .url; 
 
       if (remainingRecordings.length === 0) {
         // we don't want to await here as the exit would never be called
@@ -32,7 +32,7 @@ export default class ChooseFile extends State {
       } else {
         //
         if (
-          this.context.project.get('testRecording') !== null &&
+          this.context.project.get('testRecording')[completedTasks] !== null &&
           this.context.participant.get('testDone') === false
         ) {
           this.context.participant.set({ testing: true });
@@ -50,7 +50,9 @@ export default class ChooseFile extends State {
 
   render() {
     // @note - only in DEBUG mode
-    const audioFiles = this.context.fileSystem.state.get('medias');
+    const completedTasks = this.context.participant.get('completedTasks');
+    const audioFilesPath = this.project.get('mediaFolder')[completedTasks];
+    const audioFiles = this.context.fileSystem.state.get(audioFilesPath);
     const recordingsOverview = audioFiles.children.map(leaf => leaf.url);
 
     return html`

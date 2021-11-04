@@ -3,7 +3,7 @@ import { html } from 'lit-html';
 
 import { getCircleArea } from '../utils/annotation-area-position.js';
 
-export default class AnnotateCircle extends AnnotateBase {
+export default class AnnotateSquare extends AnnotateBase {
   constructor(name, context) {
     super(name, context);
 
@@ -41,18 +41,21 @@ export default class AnnotateCircle extends AnnotateBase {
       const normDotX = relX / size * 2 - 1;
       const normDotY = (relY / size * 2 - 1) * -1;
 
-      // inscribe in circle
-      const angle = Math.atan2(normDotY, normDotX);
-      const correctedNormX = Math.cos(angle);
-      const correctedNormY = Math.sin(angle);
+      // inscribe in unit square
+      const norm1 = Math.abs(normDotX) + Math.abs(normDotY);
 
-      this.position.x = normDotX > 0 ?
-        Math.min(normDotX, correctedNormX) :
-        Math.max(normDotX, correctedNormX);
+      if (norm1 > 0) {
+        this.position.x = norm1 > 1 ?
+          normDotX/norm1 :
+          normDotX;
 
-      this.position.y = normDotY > 0 ?
-        Math.min(normDotY, correctedNormY) :
-        Math.max(normDotY, correctedNormY);
+        this.position.y = norm1 > 1 ?
+          normDotY/norm1 :
+          normDotY;
+      } else {
+        this.position.x = 0.0;
+        this.position.y = 0.0;
+      }
 
       const data = {
         time: this.context.$mediaPlayer.currentTime,

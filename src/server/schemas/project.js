@@ -10,31 +10,37 @@ export default {
     default: null,
   },
   mediaType: {
-    type: 'string',
+    type: 'any',
     nullable: true,
-    default: null,
+    default: [],
+  },
+  mediaFolder: {
+    type: 'any',
+    nullable: true,
+    default: [],
   },
   annotationType: {
-    type: 'string',
+    type: 'any',
     nullable: true,
-    default: null,
+    default: [],
   },
   language: {
     type: 'string',
     default: 'fr',
   },
   instruction: {
-    type: 'string',
-    default: '',
+    type: 'any',
+    nullable: true,
+    default: [],
   },
   tags: {
     type: 'any',
     nullable: true,
-    default: null,
+    default: [],
   },
   testRecording: {
-    type: 'string',
+    type: 'any',
     nullable: true,
-    default: null,
+    default: [],
   },
 }

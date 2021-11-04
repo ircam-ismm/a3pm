@@ -103,10 +103,30 @@ server.stateManager.registerSchema('participant', participantSchema);
     const playerExperience = new PlayerExperience(server, 'player');
     const controllerExperience = new ControllerExperience(server, 'controller');
 
+    
+
+    const {tasks, ...globalConfig} = projectConfig;
     const project = await server.stateManager.create('project', {
-      ...projectConfig,
+      ...globalConfig,
       folder: projectPath,
     });
+    tasks.forEach(task => {
+      for (let key in task){
+        const projectValue = project.get(key);
+        projectValue.push(task[key]);
+        const toSet = {};
+        toSet[key] = projectValue;
+        project.set(toSet);
+      }
+      if (!('testRecording' in task)) {
+        const projectValue = project.get('testRecording');
+        projectValue.push(null);
+        project.set({testRecording: projectValue});
+      }
+    })
+
+
+    setTimeout(() => console.log(project.getValues()), 1000);
 
     // if for some reason, a participant reload we want to restore it's state
     // according to its given name.

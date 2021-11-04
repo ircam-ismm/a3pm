@@ -36,4 +36,8 @@ export default {
     type: 'boolean',
     default: false,
   },
+  completedTasks: {
+    type: 'integer',
+    default: 0,
+  },
 };
