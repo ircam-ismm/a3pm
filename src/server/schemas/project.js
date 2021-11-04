@@ -4,8 +4,17 @@ export default {
     nullable: true,
     default: null,
   },
+  language: {
+    type: 'string',
+    default: 'fr',
+  },
   folder: {
     type: 'string',
+    nullable: true,
+    default: null,
+  },
+  taskNumber: {
+    type: 'integer',
     nullable: true,
     default: null,
   },
@@ -23,10 +32,6 @@ export default {
     type: 'any',
     nullable: true,
     default: [],
-  },
-  language: {
-    type: 'string',
-    default: 'fr',
   },
   instruction: {
     type: 'any',

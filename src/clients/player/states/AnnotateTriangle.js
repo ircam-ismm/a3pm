@@ -3,7 +3,7 @@ import { html } from 'lit-html';
 
 import { getCircleArea } from '../utils/annotation-area-position.js';
 
-export default class AnnotateCircle extends AnnotateBase {
+export default class AnnotateTriangle extends AnnotateBase {
   constructor(name, context) {
     super(name, context);
 

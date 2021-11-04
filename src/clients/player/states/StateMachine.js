@@ -3,9 +3,10 @@ import ConfigureTags from './ConfigureTags.js';
 import ChooseFile from './ChooseFile.js';
 import AnnotateIdle from './AnnotateIdle.js';
 import AnnotateSlider from './AnnotateSlider.js';
-import AnnotateCircle from './AnnotateCircle.js';
+import AnnotateTriangle from './AnnotateTriangle.js';
 import AnnotateSquare from './AnnotateSquare.js';
 import End from './End.js';
+import StartTask from './startTask.js';
 
 const states = {
   'configure-name': ConfigureName,
@@ -13,8 +14,9 @@ const states = {
   'choose-file': ChooseFile,
   'annotate-idle': AnnotateIdle,
   'annotate-slider': AnnotateSlider,
-  'annotate-circle': AnnotateCircle,
+  'annotate-triangle': AnnotateTriangle,
   'annotate-square': AnnotateSquare,
+  'start-task': StartTask,
   'end': End,
 };
 

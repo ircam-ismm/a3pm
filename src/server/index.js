@@ -109,6 +109,7 @@ server.stateManager.registerSchema('participant', participantSchema);
     const project = await server.stateManager.create('project', {
       ...globalConfig,
       folder: projectPath,
+      taskNumber: tasks.length,
     });
     tasks.forEach(task => {
       for (let key in task){
@@ -164,8 +165,8 @@ server.stateManager.registerSchema('participant', participantSchema);
             'testDone' in updates
           ) {
             const index = participantStates.findIndex(s => s.name === participant.get('name'));
-            const { name, folder, tagsOrder, annotatedRecordings, testDone } = participant.getValues();
-            const values = { name, folder, tagsOrder, annotatedRecordings, testDone };
+            const { name, folder, tagsOrder, annotatedRecordings, testDone, completedTasks } = participant.getValues();
+            const values = { name, folder, tagsOrder, annotatedRecordings, testDone, completedTasks };
 
             if (index !== -1) {
               participantStates[index] = values;

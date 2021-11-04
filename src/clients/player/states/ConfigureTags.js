@@ -28,7 +28,7 @@ export default class ConfigureTags extends State {
   }
 
   async exit() {
-    const { name, tagsOrder } = this.context.participant.getValues();
+    const { name, tagsOrder, completedTasks } = this.context.participant.getValues();
     const now = new Date().toString();
     // log in shared to have an overview
     this.context.overviewLogger.write(`${now} - ${name} - task: ${completedTasks+1} - tagsOrder: ${tagsOrder}`);

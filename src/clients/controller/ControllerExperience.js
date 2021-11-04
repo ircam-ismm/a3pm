@@ -45,7 +45,7 @@ class ControllerExperience extends AbstractExperience {
 
   renderApp() {
     const medias = this.fileSystem.state.get('medias');
-    const recordingsOverview = medias.children.map(leaf => leaf.url);
+    const recordingsOverview = medias.children;
     const participants = Array.from(this.participants).map(p => p.getValues());
     const project = this.project.getValues();
 
@@ -86,8 +86,15 @@ class ControllerExperience extends AbstractExperience {
           })}
 
           <h2># media files</h2>
-          ${recordingsOverview.map(filename => {
-            return html`<p>- ${filename}</p>`
+          ${recordingsOverview.map(folder => {
+            return html`
+              <p>- &emsp; ${folder.url}</p>
+              ${folder.children.map(file => {
+                return html`
+                  <p>&emsp; &emsp; &emsp; &emsp;${file.name}</p>
+                `
+              })}
+            `
           })}
         </div>
       </div>

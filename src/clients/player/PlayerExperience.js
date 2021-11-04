@@ -46,12 +46,13 @@ class PlayerExperience extends AbstractExperience {
       if ('state' in updates) {
         let state;
 
+        const completedTasks = this.participant.get('completedTasks');
         if (updates.state === 'annotate') {
-          const annotationType = this.project.get('annotationType');
+          const annotationType = this.project.get('annotationType')[completedTasks];
 
           switch (annotationType) {
             case 'triangle':
-              state = 'annotate-circle';
+              state = 'annotate-triangle';
               break;
             case 'square':
               state = 'annotate-square';

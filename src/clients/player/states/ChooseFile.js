@@ -12,19 +12,19 @@ export default class ChooseFile extends State {
   async enter() {
     if (!window.DEBUG) {
       const completedTasks = this.context.participant.get('completedTasks');
-      const audioFilesPath = this.project.get('mediaFolder')[completedTasks];
-      const audioFiles = this.context.fileSystem.get(audioFilesPath);
-      const recordingsOverview = audioFiles.children
-        .filter(leaf => leaf.name !== this.context.project.get('testRecording'))
+      const projectFiles = this.context.fileSystem.get('medias');
+      const taskFiles = projectFiles.children
+        .filter(leaf => leaf.name === this.context.project.get('mediaFolder')[completedTasks])[0];
+      const recordingsOverview = taskFiles.children
+        .filter(leaf => leaf.name !== this.context.project.get('testRecording')[completedTasks])
         .map(leaf => leaf.url); 
       const annotatedRecordings = this.context.participant.get('annotatedRecordings');
       const remainingRecordings = recordingsOverview.filter(recording => {
         return !annotatedRecordings.includes(recording);
       });
 
-      const testRecording = audioFiles.children
-        .find(leaf => leaf.name === this.context.project.get('testRecording')[completedTasks])
-        .url; 
+      const testRecording = taskFiles.children
+        .find(leaf => leaf.name === this.context.project.get('testRecording')[completedTasks]);
 
       if (remainingRecordings.length === 0) {
         // we don't want to await here as the exit would never be called
@@ -36,7 +36,7 @@ export default class ChooseFile extends State {
           this.context.participant.get('testDone') === false
         ) {
           this.context.participant.set({ testing: true });
-          this.setRecording(testRecording);
+          this.setRecording(testRecording.url);
         } else {
           // pick a random recording
           const index = Math.floor(Math.random() * remainingRecordings.length);
@@ -47,13 +47,15 @@ export default class ChooseFile extends State {
       }
     }
   }
+  
 
   render() {
     // @note - only in DEBUG mode
     const completedTasks = this.context.participant.get('completedTasks');
-    const audioFilesPath = this.project.get('mediaFolder')[completedTasks];
-    const audioFiles = this.context.fileSystem.state.get(audioFilesPath);
-    const recordingsOverview = audioFiles.children.map(leaf => leaf.url);
+    const projectFiles = this.context.fileSystem.get('medias');
+    const taskFiles = projectFiles.children
+      .filter(leaf => leaf.name === this.context.project.get('mediaFolder')[completedTasks])[0];
+    const recordingsOverview = taskFiles.children.map(leaf => leaf.url);
 
     return html`
       <p>${this.texts.title}</p>

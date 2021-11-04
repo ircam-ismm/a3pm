@@ -6,9 +6,9 @@
       instruction: 'Tache numero 1',
       annotationType: 'square',
       mediaType: 'audio',
-      mediaFolder: 'medias/',
+      mediaFolder: 'task1',
       tags: [
-        [' ', ' ', ' ', ' '],
+        ['top', 'right', 'bottom', 'left'],
       ],
       testRecording: 'test.wav',
     },
@@ -16,7 +16,7 @@
       instruction: 'Tache numero 2',
       annotationType: 'slider',
       mediaType: 'audio',
-      mediaFolder: 'medias/',
+      mediaFolder: 'task2',
       tags: [
         ['left', 'right'],
       ],

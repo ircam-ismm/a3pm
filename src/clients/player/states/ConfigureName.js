@@ -44,7 +44,7 @@ export default class ConfigureName extends State {
       await this.context.participant.set({
         name,
         folder,
-        state: 'configure-tags',
+        state: 'start-task',
       });
     }
   }
