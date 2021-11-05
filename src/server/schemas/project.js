@@ -4,37 +4,48 @@ export default {
     nullable: true,
     default: null,
   },
+  language: {
+    type: 'string',
+    default: 'fr',
+  },
   folder: {
     type: 'string',
     nullable: true,
     default: null,
   },
-  mediaType: {
-    type: 'string',
+  taskNumber: {
+    type: 'integer',
     nullable: true,
     default: null,
+  },
+  mediaType: {
+    type: 'any',
+    nullable: true,
+    default: [],
+  },
+  mediaFolder: {
+    type: 'any',
+    nullable: true,
+    default: [],
   },
   annotationType: {
-    type: 'string',
+    type: 'any',
     nullable: true,
-    default: null,
-  },
-  language: {
-    type: 'string',
-    default: 'fr',
+    default: [],
   },
   instruction: {
-    type: 'string',
-    default: '',
+    type: 'any',
+    nullable: true,
+    default: [],
   },
   tags: {
     type: 'any',
     nullable: true,
-    default: null,
+    default: [],
   },
   testRecording: {
-    type: 'string',
+    type: 'any',
     nullable: true,
-    default: null,
+    default: [],
   },
 }

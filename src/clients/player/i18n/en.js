@@ -3,8 +3,13 @@ export default {
     title: 'Participant name:',
     btn: 'Submit',
   },
+  'start-task': {
+    title: 'You are about to begin task ',
+    btn: 'Begin',
+  },
   'configure-tags': {
     titleTriangle: 'Choose tags order (top, bottom-right, bottom-left):',
+    titleSquare: 'Choose tags order (top, right, bottom, left):',
     titleSlider: 'Choose tags order (left, right):',
   },
   'choose-file': {
@@ -17,7 +22,10 @@ export default {
   'annotate-slider': {
     title: 'Annotating',
   },
-  'annotate-circle': {
+  'annotate-triangle': {
+    title: 'Annotating',
+  },
+  'annotate-square': {
     title: 'Annotating',
   },
   'end': {

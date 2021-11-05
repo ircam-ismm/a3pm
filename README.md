@@ -2,18 +2,9 @@
 
 > Application for (Auto-)Annotation of Musical Performances
 
-short description
-
-## Installation
-
-## Configuration
-
 ## Usage
 
-## Todos
-
-- fix DEBUG=false bugs
-- improve layout for phones
+[https://docs.google.com/document/d/1vqD0K0iZ0ejTZbybB9KAijrWhOkhJx7Pb20sniywVM0/edit?usp=sharing](https://docs.google.com/document/d/1vqD0K0iZ0ejTZbybB9KAijrWhOkhJx7Pb20sniywVM0/edit?usp=sharing)
 
 ## Credits
 

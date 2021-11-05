@@ -134,26 +134,37 @@ export default class AnnotateSquare extends AnnotateBase {
             top: -20px;
           "
         >${tagsOrder[0]}</span>
-        <!-- bottom right -->
+        <!-- right -->
         <span
           style="
             font-size: 1.2rem;
+            text-align: left;
             position: absolute;
-            bottom: ${size * ((1 - Math.sin(Math.PI / 6)) / 2)}px;
-            left: ${size}px;
+            top: ${size/2-8}px;
+            left: ${size+10}px; 
           "
         >${tagsOrder[1]}</span>
-        <!-- bottom left -->
+        <!-- bottom -->
         <span
           style="
+            width: ${size}px;
             font-size: 1.2rem;
             text-align: center;
             position: absolute;
-            bottom: ${size * ((1 - Math.sin(Math.PI / 6)) / 2)}px;
-            right: ${size}px;
+            top: ${size+5}px;
           "
         >${tagsOrder[2]}</span>
-
+        <!-- left -->
+        <span
+          style="
+            font-size: 1.2rem;
+            text-align: right;
+            position: absolute;
+            top: ${size/2-8}px;
+            right: ${size+10}px; 
+          "
+        >${tagsOrder[3]}</span>
+        
         <!-- inner circle -->
         <div style="
           position: absolute;

@@ -3,9 +3,14 @@ export default {
     title: 'Nom du participant:',
     btn: 'Envoyer',
   },
+  'start-task': {
+    title: 'Vous allez commencer la tâche ',
+    btn: 'Commencer',
+  },
   'configure-tags': {
     titleSlider: `Définir l'ordre des marqueurs (gauche, droite)`,
     titleTriangle: `Définir l'ordre des marqueurs (haut, bas-droite, bas-gauche):`,
+    titleSquare: `Définir l'ordre des marqueurs (haut, droite, bas, gauche):`,
   },
   'choose-file': {
     title: `Choisir le fichier à annoter:`
@@ -17,7 +22,10 @@ export default {
   'annotate-slider': {
     title: 'Annotation de',
   },
-  'annotate-circle': {
+  'annotate-triangle': {
+    title: 'Annotation de',
+  },
+  'annotate-square': {
     title: 'Annotation de',
   },
   'end': {

@@ -12,17 +12,18 @@ export default class AnnotateBase extends State {
 
   async enter() {
     // @note - this should belong to a Annotate parent class
-    const { name, recording, folder } = this.context.participant.getValues();
+    const { name, recording, folder, completedTasks } = this.context.participant.getValues();
+    const mediaFolder = this.context.project.get('mediaFolder')[completedTasks];
     const now = new Date().toString();
 
     const testing = this.context.participant.get('testing');
 
-    this.context.overviewLogger.write(`[${now}] - ${name} - recording: ${recording} (test: ${testing})`);
-    this.context.metasLogger.write(`[${now}] - recording: ${recording} (test: ${testing})`);
+    this.context.overviewLogger.write(`[${now}] - ${name} - task: ${completedTasks+1} - recording: ${recording} (test: ${testing})`);
+    this.context.metasLogger.write(`[${now}] - task: ${completedTasks+1} - recording: ${recording} (test: ${testing})`);
 
     let filename = testing ?
-      `${folder}/${name}_${basename(recording)}-test.txt` :
-      `${folder}/${name}_${basename(recording)}.txt`;
+      `${folder}/${mediaFolder}/${name}_${basename(recording)}-test.txt` :
+      `${folder}/${mediaFolder}/${name}_${basename(recording)}.txt`;
 
     this.context.annotationLogger = await this.context.logger.create(filename, {
       bufferSize: 200,

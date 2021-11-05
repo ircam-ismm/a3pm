@@ -14,6 +14,10 @@ export default {
     default: null,
     nullable: true,
   },
+  completedTasks: {
+    type: 'integer',
+    default: 0,
+  },
   tagsOrder: {
     type: 'any',
     default: null,

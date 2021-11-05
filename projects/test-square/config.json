@@ -1,0 +1,25 @@
+{
+  name: 'my test square project',
+  language: 'fr',
+  tasks: [
+    {
+      instruction: 'Tache numero 1',
+      annotationType: 'square',
+      mediaType: 'audio',
+      mediaFolder: 'task1',
+      tags: [
+        ['top', 'right', 'bottom', 'left'],
+      ],
+      testRecording: 'test.wav',
+    },
+    {
+      instruction: 'Tache numero 2',
+      annotationType: 'slider',
+      mediaType: 'audio',
+      mediaFolder: 'task2',
+      tags: [
+        ['left', 'right'],
+      ],
+    },
+  ],
+}

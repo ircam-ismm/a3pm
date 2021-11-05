@@ -30,7 +30,7 @@ export default class AnnotateSlider extends AnnotateBase {
 
   render() {
     const sliderHeight = 60;
-    const { recording, tagsOrder } = this.context.participant.getValues();
+    const { recording, tagsOrder, completedTasks } = this.context.participant.getValues();
     const { size, left, top } = getSliderArea(sliderHeight);
 
     const testing = this.context.participant.get('testing');
@@ -41,7 +41,7 @@ export default class AnnotateSlider extends AnnotateBase {
     }
 
     const view = html`
-      <p>${this.context.project.get('instruction')}</p>
+      <p>${this.context.project.get('instruction')[completedTasks]}</p>
 
       <span
         style="position: absolute; top: ${top - 30}px; left: ${left}px; font-size: 1.2rem"
