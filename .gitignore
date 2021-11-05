@@ -30,3 +30,4 @@ _resources
 /projects/*
 !/projects/test-*
 /projects/*/measures
+/projects/*/medias

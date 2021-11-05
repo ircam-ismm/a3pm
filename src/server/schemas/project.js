@@ -28,6 +28,11 @@ export default {
     nullable: true,
     default: [],
   },
+  mediaOrder: {
+    type: 'any',
+    nullable: true,
+    default: [],
+  },
   annotationType: {
     type: 'any',
     nullable: true,

@@ -41,6 +41,7 @@ export default class AnnotateSlider extends AnnotateBase {
     }
 
     const view = html`
+      <p>${title}"</p>
       <p>${this.context.project.get('instruction')[completedTasks]}</p>
 
       <span

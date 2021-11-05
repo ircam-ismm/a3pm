@@ -38,8 +38,17 @@ export default class ChooseFile extends State {
           this.context.participant.set({ testing: true });
           this.setRecording(testRecording.url);
         } else {
-          // pick a random recording
-          const index = Math.floor(Math.random() * remainingRecordings.length);
+          // pick next recording
+          const mediaOrder = this.context.project.get('mediaOrder')[completedTasks];
+          let index;
+          switch (mediaOrder) {
+            case 'random':
+              index = Math.floor(Math.random() * remainingRecordings.length);
+              break;
+            case 'alphabetical':
+              index = 0;
+              break;
+          }
           const recording = remainingRecordings[index];
           // we don't want to await here as the exit would never be called
           this.setRecording(recording);

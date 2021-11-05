@@ -4,11 +4,12 @@
   tasks: [
     {
       instruction: 'Tache numero 1',
-      annotationType: 'square',
+      annotationType: 'slider',
       mediaType: 'audio',
       mediaFolder: 'task1',
+      mediaOrder: 'random',
       tags: [
-        ['top', 'right', 'bottom', 'left'],
+        ['top', 'right'],
       ],
       testRecording: 'test.wav',
     },
@@ -17,6 +18,7 @@
       annotationType: 'slider',
       mediaType: 'audio',
       mediaFolder: 'task2',
+      mediaOrder: 'alphabetical',
       tags: [
         ['left', 'right'],
       ],

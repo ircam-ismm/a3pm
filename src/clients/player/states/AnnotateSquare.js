@@ -101,7 +101,7 @@ export default class AnnotateSquare extends AnnotateBase {
    */
   render() {
     const { size, left, top } = getCircleArea();
-    const { recording, tagsOrder } = this.context.participant.getValues();
+    const { recording, tagsOrder, completedTasks } = this.context.participant.getValues();
 
     const testing = this.context.participant.get('testing');
     let title = `${this.texts.title} "${recording}"`;
@@ -112,6 +112,8 @@ export default class AnnotateSquare extends AnnotateBase {
 
     const view = html`
       <p>${title}"</p>
+      <p>${this.context.project.get('instruction')[completedTasks]}</p>
+      
 
       <div style="
         position: absolute;
