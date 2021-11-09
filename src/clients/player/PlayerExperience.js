@@ -63,6 +63,8 @@ class PlayerExperience extends AbstractExperience {
             case 'markers':
               state = 'annotate-markers';
               break;
+            case 'audio-player':
+              state = 'audio-player';
           }
         } else {
           state = updates.state;
@@ -92,9 +94,11 @@ class PlayerExperience extends AbstractExperience {
         document.removeEventListener('click', testAnnotationPage);
 
         const completedTasks = this.participant.get('completedTasks');
-        const audioFilesPath = this.project.get('mediaFolder')[completedTasks];
-        const audioFiles = this.fileSystem.get(audioFilesPath);
-        const recordings = audioFiles.children.map(leaf => leaf.url);
+        // const audioFilesPath = this.project.get('mediaFolder')[completedTasks];
+        const projectFiles = this.fileSystem.get('medias');
+        const taskFiles = projectFiles.children
+          .filter(leaf => leaf.name === this.project.get('mediaFolder')[completedTasks])[0];
+        const recordings = taskFiles.children.map(leaf => leaf.url);
         this.metasLogger = { write: (msg) => console.log(msg) };
         // test-triangle project
         await this.participant.set({

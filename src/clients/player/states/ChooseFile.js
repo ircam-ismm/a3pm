@@ -42,11 +42,12 @@ export default class ChooseFile extends State {
           const mediaOrder = this.context.project.get('mediaOrder')[completedTasks];
           let index;
           switch (mediaOrder) {
-            case 'random':
-              index = Math.floor(Math.random() * remainingRecordings.length);
-              break;
             case 'alphabetical':
               index = 0;
+              break;
+            case 'random':
+            default:
+              index = Math.floor(Math.random() * remainingRecordings.length);
               break;
           }
           const recording = remainingRecordings[index];

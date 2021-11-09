@@ -1,0 +1,13 @@
+{
+  name: 'Annotation de la tension expressive',
+  language: 'fr',
+  tasks: [
+    {
+      annotationType: 'audio-player',
+      mediaType: 'audio',
+      mediaFolder: 'audio-player',
+      instruction: 'Réécoutez librement l'extrait et annotez le sur votre feuille',
+      tags: [],
+    },
+  ],
+}

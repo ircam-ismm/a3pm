@@ -21,7 +21,7 @@ export default class ConfigureTags extends State {
     const tags = this.context.project.get('tags')[completedTasks];
 
     // if we only have 1 tag list, just use it
-    if (tags.length === 1) {
+    if (tags.length <= 1) {
       console.log('+ only 1 tag choice, bypass choice', tags[0]);
       this.setTagsOrder(tags[0]);
     }

@@ -28,6 +28,10 @@ export default {
   'annotate-square': {
     title: 'Annotating',
   },
+  'audio-player': {
+    title: 'Annotating',
+    btn: 'Done',
+  },
   'end': {
     title: `Thanks for your participation`,
   },

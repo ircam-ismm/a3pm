@@ -29,6 +29,7 @@
     "json5": "^2.2.0",
     "lit-element": "^2.5.0",
     "lit-html": "^1.4.0",
+    "node-wav": "0.0.2",
     "regenerator-runtime": "^0.13.7",
     "serve-static": "^1.14.1",
     "slugify": "^1.6.0",

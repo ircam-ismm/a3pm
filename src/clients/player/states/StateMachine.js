@@ -7,6 +7,7 @@ import AnnotateTriangle from './AnnotateTriangle.js';
 import AnnotateSquare from './AnnotateSquare.js';
 import End from './End.js';
 import StartTask from './startTask.js';
+import AudioPlayer from './AudioPlayer.js';
 
 const states = {
   'configure-name': ConfigureName,
@@ -16,6 +17,7 @@ const states = {
   'annotate-slider': AnnotateSlider,
   'annotate-triangle': AnnotateTriangle,
   'annotate-square': AnnotateSquare,
+  'audio-player': AudioPlayer,
   'start-task': StartTask,
   'end': End,
 };
