@@ -86,7 +86,7 @@ class PlayerExperience extends AbstractExperience {
     const language = this.project.get('language');
     this.texts = i18n[language];
 
-    const FORCE_ANNOTATION = true;
+    const FORCE_ANNOTATION = false;
 
     if (FORCE_ANNOTATION) {
       // @testing - test annotationPage
