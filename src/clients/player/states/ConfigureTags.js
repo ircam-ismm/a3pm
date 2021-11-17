@@ -17,8 +17,8 @@ export default class ConfigureTags extends State {
       this.context.participant.set({ state: 'choose-file' });
     }
 
-    const completedTasks = this.context.participant.get('completedTasks');
-    const tags = this.context.project.get('tags')[completedTasks];
+    const currentTaskIndex = this.context.participant.get('currentTaskIndex');
+    const tags = this.context.project.get('tags')[currentTaskIndex];
 
     // if we only have 1 tag list, just use it
     if (tags.length <= 1) {
@@ -28,17 +28,19 @@ export default class ConfigureTags extends State {
   }
 
   async exit() {
-    const { name, tagsOrder, completedTasks } = this.context.participant.getValues();
+    const { name, tagsOrder, currentTaskIndex } = this.context.participant.getValues();
     const now = new Date().toString();
     // log in shared to have an overview
-    this.context.overviewLogger.write(`${now} - ${name} - task: ${completedTasks+1} - tagsOrder: ${tagsOrder}`);
-    this.context.metasLogger.write(`${now} - task: ${completedTasks+1} - tagsOrder: ${tagsOrder}`);
+    this.context.overviewLogger.write(
+      `${now} - ${name} - task: ${currentTaskIndex + 1} - tagsOrder: ${tagsOrder}`);
+    this.context.metasLogger.write(
+      `${now} - task: ${currentTaskIndex + 1} - tagsOrder: ${tagsOrder}`);
   }
 
   render() {
-    const completedTasks = this.context.participant.get('completedTasks');
-    const tags = this.context.project.get('tags')[completedTasks];
-    const annotationType = this.context.project.get('annotationType')[completedTasks];
+    const currentTaskIndex = this.context.participant.get('currentTaskIndex');
+    const tags = this.context.project.get('tags')[currentTaskIndex];
+    const annotationType = this.context.project.get('annotationType')[currentTaskIndex];
     let title = null;
 
     if (annotationType === 'slider') {

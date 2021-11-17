@@ -44,11 +44,11 @@ class PlayerExperience extends AbstractExperience {
     this.participant = await this.client.stateManager.create('participant');
     this.participant.subscribe(async updates => {
       if ('state' in updates) {
+        const currentTaskIndex = this.participant.get('currentTaskIndex');
         let state;
 
-        const completedTasks = this.participant.get('completedTasks');
         if (updates.state === 'annotate') {
-          const annotationType = this.project.get('annotationType')[completedTasks];
+          const annotationType = this.project.get('annotationType')[currentTaskIndex];
 
           switch (annotationType) {
             case 'triangle':
@@ -60,8 +60,8 @@ class PlayerExperience extends AbstractExperience {
             case 'slider':
               state = 'annotate-slider';
               break;
-            case 'markers':
-              state = 'annotate-markers';
+            // case 'markers':
+            //   state = 'annotate-markers';
               break;
             case 'audio-player':
               state = 'audio-player';
@@ -83,39 +83,41 @@ class PlayerExperience extends AbstractExperience {
       }
     });
 
+    const language = this.project.get('language');
+    this.texts = i18n[language];
 
-    this.texts = i18n[this.project.get('language')];
-
-    const FORCE_ANNOTATION = false;
+    const FORCE_ANNOTATION = true;
 
     if (FORCE_ANNOTATION) {
-      // @TESTING - test annotationPage
+      // @testing - test annotationPage
       const testAnnotationPage = async () => {
         document.removeEventListener('click', testAnnotationPage);
 
-        const completedTasks = this.participant.get('completedTasks');
-        // const audioFilesPath = this.project.get('mediaFolder')[completedTasks];
+        const currentTaskIndex = this.participant.get('currentTaskIndex');
+        const mediaFolder = this.project.get('mediaFolder')[currentTaskIndex];
+        const tags = this.project.get('tags')[currentTaskIndex];
         const projectFiles = this.fileSystem.get('medias');
-        const taskFiles = projectFiles.children
-          .filter(leaf => leaf.name === this.project.get('mediaFolder')[completedTasks])[0];
-        const recordings = taskFiles.children.map(leaf => leaf.url);
+
+        const recordings = projectFiles.children
+          .find(leaf => leaf.name === mediaFolder)
+          .children
+          .map(leaf => leaf.url);
+
         this.metasLogger = { write: (msg) => console.log(msg) };
-        // test-triangle project
-        await this.participant.set({
+
+        this.participant.set({
           name: 'test-user',
           folder: 'test-user-42',
           recording: recordings[0],
-          tagsOrder: this.project.get('tags')[completedTasks][0],
+          tagsOrder: tags[0],
           state: 'annotate',
         });
-        // mock meta logger
       }
 
       document.addEventListener('click', testAnnotationPage);
     } else {
       // default state machine initialization
       this.participant.set({ state: 'configure-name' });
-      // this.participant.set({ state: 'end' });
     }
 
 

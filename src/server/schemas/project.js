@@ -13,7 +13,7 @@ export default {
     nullable: true,
     default: null,
   },
-  taskNumber: {
+  numTasks: {
     type: 'integer',
     nullable: true,
     default: null,

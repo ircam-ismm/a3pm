@@ -14,7 +14,7 @@ export default {
     default: null,
     nullable: true,
   },
-  completedTasks: {
+  currentTaskIndex: {
     type: 'integer',
     default: 0,
   },

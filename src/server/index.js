@@ -109,7 +109,7 @@ server.stateManager.registerSchema('participant', participantSchema);
     const project = await server.stateManager.create('project', {
       ...globalConfig,
       folder: projectPath,
-      taskNumber: tasks.length,
+      numTasks: tasks.length,
     });
     tasks.forEach(task => {
       for (let key in task){
@@ -143,11 +143,7 @@ server.stateManager.registerSchema('participant', participantSchema);
             ...updates,
             ...storedParticipant
           }
-        } else {
-          return updates; // that's boring...
         }
-      } else {
-        return updates; // that's boring...
       }
     });
 
@@ -165,17 +161,31 @@ server.stateManager.registerSchema('participant', participantSchema);
             'testDone' in updates
           ) {
             const index = participantStates.findIndex(s => s.name === participant.get('name'));
-            const { name, folder, tagsOrder, annotatedRecordings, testDone, completedTasks } = participant.getValues();
-            const values = { name, folder, tagsOrder, annotatedRecordings, testDone, completedTasks };
+
+            // cherry pick values we want to store
+            const {
+              name,
+              folder,
+              tagsOrder,
+              annotatedRecordings,
+              testDone,
+              currentTaskIndex
+            } = participant.getValues();
+
+            const values = {
+              name,
+              folder,
+              tagsOrder,
+              annotatedRecordings,
+              testDone,
+              currentTaskIndex
+            };
 
             if (index !== -1) {
               participantStates[index] = values;
             } else {
               participantStates.push(values);
             }
-
-            // console.log('stored participant state at index', index);
-            // console.log(participantStates);
           }
         });
       }
