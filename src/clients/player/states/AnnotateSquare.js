@@ -103,7 +103,6 @@ export default class AnnotateSquare extends AnnotateBase {
       <p>${title}"</p>
       <p>${this.context.project.get('instruction')[currentTaskIndex]}</p>
       
-
       <div style="
         position: absolute;
         width: ${size}px;

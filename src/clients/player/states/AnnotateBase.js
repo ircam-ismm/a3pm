@@ -1,8 +1,10 @@
 import State from './State.js';
 import { html } from 'lit-html';
+import slugify from 'slugify';
 
-function basename(path) {
-  return path.split('/').reverse()[0];
+function cleanBasename(path) {
+  const basename = path.split('/').reverse()[0];
+  return slugify(basename, { remove: /[*+~(),`'"!:@]/g });
 }
 
 export default class AnnotateBase extends State {
@@ -31,11 +33,16 @@ export default class AnnotateBase extends State {
 
     const mediaFolder = this.context.project.get('mediaFolder')[currentTaskIndex];
     const filename = testing ?
-      `${folder}/${mediaFolder}/${name}_${basename(recording)}-test.txt` :
-      `${folder}/${mediaFolder}/${name}_${basename(recording)}.txt`;
+      `${folder}/${mediaFolder}/${name}_${cleanBasename(recording)}-test.txt` :
+      `${folder}/${mediaFolder}/${name}_${cleanBasename(recording)}.txt`;
 
     this.context.annotationLogger = await this.context.logger.create(filename, {
       bufferSize: 20 * 2, // send a buffer every two seconds
+    });
+
+    // feedback for controller
+    this.context.annotationLogger.addEventListener('packetsend', () => {
+      this.context.participant.set({ annotationPacketSent: true });
     });
 
     this.context.$mediaPlayer.src = recording;

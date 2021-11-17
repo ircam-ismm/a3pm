@@ -3,7 +3,7 @@
   language: 'fr',
   tasks: [
     {
-      instruction: 'Tache numero 1',
+      instruction: 'Tâche numero 1',
       annotationType: 'square',
       mediaType: 'audio',
       mediaFolder: 'task-1',

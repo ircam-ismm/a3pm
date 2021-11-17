@@ -22,7 +22,7 @@
     "@ircam/simple-components": "^1.2.0",
     "@soundworks/core": "^3.1.0-beta.2",
     "@soundworks/plugin-filesystem": "^1.0.0",
-    "@soundworks/plugin-logger": "^1.0.1",
+    "@soundworks/plugin-logger": "^1.1.0",
     "@soundworks/template-helpers": "^1.0.1",
     "@webcomponents/webcomponentsjs": "^2.4.3",
     "core-js": "^3.11.3",
@@ -32,7 +32,7 @@
     "node-wav": "0.0.2",
     "regenerator-runtime": "^0.13.7",
     "serve-static": "^1.14.1",
-    "slugify": "^1.6.0",
+    "slugify": "^1.6.2",
     "source-map-support": "^0.5.19",
     "template-literal": "^1.0.3"
   },

@@ -107,6 +107,7 @@ class PlayerExperience extends AbstractExperience {
 
         this.participant.set({
           name: 'test-user',
+          slug: 'test-user',
           folder: 'test-user-42',
           recording: recordings[0],
           tagsOrder: tags[0],

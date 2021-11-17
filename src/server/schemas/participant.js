@@ -9,6 +9,11 @@ export default {
     default: null,
     nullable: true,
   },
+  slug: {
+    type: 'string',
+    default: null,
+    nullable: true,
+  },
   folder: {
     type: 'string',
     default: null,
@@ -39,5 +44,9 @@ export default {
   testing: {
     type: 'boolean',
     default: false,
+  },
+  annotationPacketSent: {
+    type: 'boolean',
+    event: true,
   },
 };
