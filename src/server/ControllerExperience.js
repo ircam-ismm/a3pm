@@ -1,4 +1,5 @@
 import { AbstractExperience } from '@soundworks/core/server';
+import fs from 'fs';
 
 class PlayerExperience extends AbstractExperience {
   constructor(server, clientTypes, options = {}) {
@@ -13,6 +14,10 @@ class PlayerExperience extends AbstractExperience {
 
   enter(client) {
     super.enter(client);
+
+    client.socket.addListener('filePath', async path => {
+      console.log(path);
+    });
   }
 
   exit(client) {

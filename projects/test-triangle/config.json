@@ -1,14 +1,34 @@
 {
   name: 'my test triangle project',
-  annotationType: 'triangle',
-  mediaType: 'audio',
-  tags: [
-    ['sans', 'avec', 'contre'],
-    ['sans', 'contre', 'avec'],
-    ['avec', 'contre', 'sans'],
-    ['avec', 'sans', 'contre'],
-    ['contre', 'avec', 'sans'],
-    ['contre', 'sans', 'avec'],
-  ],
-  testRecording: 'test.wav',
+  tasks: [
+    {
+      annotationType: 'triangle',
+      mediaType: 'audio',
+      mediaFolder: 'task1',
+      tags: [
+        ['sans', 'avec', 'contre'],
+        ['sans', 'contre', 'avec'],
+        ['avec', 'contre', 'sans'],
+        ['avec', 'sans', 'contre'],
+        ['contre', 'avec', 'sans'],
+        ['contre', 'sans', 'avec'],
+      ],
+      testRecording: 'test.wav',
+    },
+    {
+      annotationType: 'triangle',
+      mediaType: 'audio',
+      mediaFolder: 'task2',
+      tags: [
+        ['sans', 'avec', 'contre'],
+        ['sans', 'contre', 'avec'],
+        ['avec', 'contre', 'sans'],
+        ['avec', 'sans', 'contre'],
+        ['contre', 'avec', 'sans'],
+        ['contre', 'sans', 'avec'],
+      ],
+      testRecording: 'test.wav',
+    }
+  ]
+  
 }

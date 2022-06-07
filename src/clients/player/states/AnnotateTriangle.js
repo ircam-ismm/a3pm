@@ -160,7 +160,7 @@ export default class AnnotateTriangle extends AnnotateBase {
           top: 0;
           left: 0;
           border-radius: 50%;
-          background: url(./images/square-bg.png) 50% 50% no-repeat;
+          background: url(./images/triangle-bg.png) 50% 50% no-repeat;
           background-size: 100% 100%;
         "></div>
 

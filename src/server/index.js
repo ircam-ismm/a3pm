@@ -64,6 +64,11 @@ server.pluginManager.register('file-system', pluginFileSystemFactory, {
     path: path.join(projectPath, 'medias'),
     publicDirectory: 'medias',
     watch: true,
+  },{
+    name: 'measures',
+    path: path.join(projectPath, 'measures'),
+    publicDirectory: 'measures',
+    watch: true,
   }],
 });
 
