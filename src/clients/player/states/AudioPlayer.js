@@ -16,7 +16,7 @@ export default class AudioPlayer extends State {
   }
 
   enter() {
-    const { name, recording, folder, completedTasks } = this.context.participant.getValues();
+    const { name, recording, folder, currentTaskIndex } = this.context.participant.getValues();
     const now = new Date().toString();
 
     this.context.client.socket.send('sendFilename', recording, this.wvWidth, this.wvHeight);
@@ -55,10 +55,10 @@ export default class AudioPlayer extends State {
     function test(value) {console.log(35, this.startTime)};
     test.call(this);
 
-    this.context.overviewLogger.write(`[${now}] - ${name} - task: ${completedTasks+1} - recording: ${recording}`);
-    this.context.metasLogger.write(`[${now}] - task: ${completedTasks+1} - recording: ${recording}`);
-
-    this.context.render();
+    this.context.overviewLogger.write(
+        `[${now}] - ${name} - task: ${currentTaskIndex + 1} - recording: ${recording}`);
+    this.context.metasLogger.write(
+      `[${now}] - task: ${currentTaskIndex + 1} - recording: ${recording}`);
   }
   
 
@@ -116,7 +116,7 @@ export default class AudioPlayer extends State {
   }
 
   render() {
-    const { recording, tagsOrder, completedTasks } = this.context.participant.getValues();
+    const { recording, tagsOrder, currentTaskIndex } = this.context.participant.getValues();
 
     const testing = this.context.participant.get('testing');
     let title = `${this.texts.title} "${recording}"`;
@@ -127,7 +127,7 @@ export default class AudioPlayer extends State {
 
     return html`
       <p>${title}"</p>
-      <p>${this.context.project.get('instruction')[completedTasks]}</p>
+      <p>${this.context.project.get('instruction')[currentTaskIndex]}</p>
 
       <div 
         style="

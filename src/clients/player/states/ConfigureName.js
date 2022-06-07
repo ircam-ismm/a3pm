@@ -39,10 +39,12 @@ export default class ConfigureName extends State {
     }
 
     if (name !== '') {
-      const folder = `${date()}-${name}-${this.context.client.id}`;
+      const slug = slugify(name, { remove: /[*+~(),.`'"!:@]/g });
+      const folder = `${date()}-${slug}-${this.context.client.id}`;
 
       await this.context.participant.set({
         name,
+        slug,
         folder,
         state: 'start-task',
       });
@@ -50,8 +52,8 @@ export default class ConfigureName extends State {
   }
 
   async exit() {
-    const { folder, name } = this.context.participant.getValues();
-    this.context.metasLogger = await this.context.logger.create(`${folder}/${name}.txt`);
+    const { folder, name, slug } = this.context.participant.getValues();
+    this.context.metasLogger = await this.context.logger.create(`${folder}/${slug}.txt`);
 
     const now = new Date().toString();
     this.context.overviewLogger.write(`[${now}] - ${name} - folder: ${folder}`);

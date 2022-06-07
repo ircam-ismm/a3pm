@@ -3,25 +3,15 @@
   language: 'fr',
   tasks: [
     {
-      instruction: 'Tache numero 1',
-      annotationType: 'slider',
+      instruction: 'Tâche numero 1',
+      annotationType: 'square',
       mediaType: 'audio',
-      mediaFolder: 'task1',
+      mediaFolder: 'task-1',
       mediaOrder: 'random',
       tags: [
-        ['top', 'right'],
+        ['top', 'right', 'bottom', 'left'],
       ],
-      testRecording: 'test.wav',
-    },
-    {
-      instruction: 'Tache numero 2',
-      annotationType: 'slider',
-      mediaType: 'audio',
-      mediaFolder: 'task2',
-      mediaOrder: 'alphabetical',
-      tags: [
-        ['left', 'right'],
-      ],
+      // testRecording: 'test.wav',
     },
   ],
 }

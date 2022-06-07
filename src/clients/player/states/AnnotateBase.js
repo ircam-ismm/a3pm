@@ -1,32 +1,48 @@
 import State from './State.js';
 import { html } from 'lit-html';
+import slugify from 'slugify';
 
-function basename(path) {
-  return path.split('/').reverse()[0];
+function cleanBasename(path) {
+  const basename = path.split('/').reverse()[0];
+  return slugify(basename, { remove: /[*+~(),`'"!:@]/g });
 }
 
 export default class AnnotateBase extends State {
   constructor(name, context) {
     super(name, context);
+
+    this._periodRecordTimeoutId = null;
   }
 
   async enter() {
     // @note - this should belong to a Annotate parent class
-    const { name, recording, folder, completedTasks } = this.context.participant.getValues();
-    const mediaFolder = this.context.project.get('mediaFolder')[completedTasks];
-    const now = new Date().toString();
+    const {
+      name,
+      recording,
+      folder,
+      currentTaskIndex,
+    } = this.context.participant.getValues();
 
+    const now = new Date().toString();
     const testing = this.context.participant.get('testing');
 
-    this.context.overviewLogger.write(`[${now}] - ${name} - task: ${completedTasks+1} - recording: ${recording} (test: ${testing})`);
-    this.context.metasLogger.write(`[${now}] - task: ${completedTasks+1} - recording: ${recording} (test: ${testing})`);
+    this.context.overviewLogger.write(
+      `[${now}] - ${name} - task: ${currentTaskIndex + 1} - recording: ${recording} (test: ${testing})`);
+    this.context.metasLogger.write(
+      `[${now}] - task: ${currentTaskIndex + 1} - recording: ${recording} (test: ${testing})`);
 
-    let filename = testing ?
-      `${folder}/${mediaFolder}/${name}_${basename(recording)}-test.txt` :
-      `${folder}/${mediaFolder}/${name}_${basename(recording)}.txt`;
+    const mediaFolder = this.context.project.get('mediaFolder')[currentTaskIndex];
+    const filename = testing ?
+      `${folder}/${mediaFolder}/${name}_${cleanBasename(recording)}-test.txt` :
+      `${folder}/${mediaFolder}/${name}_${cleanBasename(recording)}.txt`;
 
     this.context.annotationLogger = await this.context.logger.create(filename, {
-      bufferSize: 200,
+      bufferSize: 20 * 2, // send a buffer every two seconds
+    });
+
+    // feedback for controller
+    this.context.annotationLogger.addEventListener('packetsend', () => {
+      this.context.participant.set({ annotationPacketSent: true });
     });
 
     this.context.$mediaPlayer.src = recording;
@@ -42,6 +58,9 @@ export default class AnnotateBase extends State {
   }
 
   async exit() {
+    // stop periodic record
+    clearTimeout(this._periodRecordTimeoutId);
+
     this.context.annotationLogger.close();
     this.context.annotationLogger = null;
 
@@ -65,6 +84,21 @@ export default class AnnotateBase extends State {
 
       await this.context.participant.set({ annotatedRecordings });
     }
+  }
+
+  // defaults to 50ms
+  recordPeriodic(period = 0.05) {
+    // - don't try to access logger when entering or exiting
+    // - don't log if the media is paused
+    if (this.status === 'entered' && !this.context.$mediaPlayer.paused) {
+      // make a copy to be sure to record every move
+      const position = Object.assign({}, this.position);
+      const time = this.context.$mediaPlayer.currentTime;
+
+      this.context.annotationLogger.write({ time, position });
+    }
+
+    this._periodRecordTimeoutId = setTimeout(() => this.recordPeriodic(period), period * 1000);
   }
 
   render(childView) {

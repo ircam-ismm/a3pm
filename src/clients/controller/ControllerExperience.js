@@ -1,8 +1,10 @@
 import { AbstractExperience } from '@soundworks/core/client';
-import { render, html } from 'lit-html';
+import { render, html, nothing } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
 import '@ircam/simple-components/sc-button.js';
 
+
+import '@ircam/simple-components/sc-bang.js';
 
 class ControllerExperience extends AbstractExperience {
   constructor(client, config, $container) {
@@ -29,18 +31,32 @@ class ControllerExperience extends AbstractExperience {
 
         participant.onDetach(() => {
           this.participants.delete(participant);
-          this.renderApp();
+          this.render();
         });
 
-        participant.subscribe(update => this.renderApp());
+        let $packetFeedbackBang = null;
+
+        participant.subscribe(updates => {
+          if (!$packetFeedbackBang) {
+            const id = `#packet-feedback-${participant.get('slug')}`;
+            $packetFeedbackBang = document.querySelector(id);
+          }
+
+          if (updates.annotationPacketSent) {
+            $packetFeedbackBang.active = true;
+          }
+
+          this.render();
+        });
 
         this.participants.add(participant);
-        this.renderApp();
+        this.render();
       }
     });
 
-    this.fileSystem.state.subscribe(() => this.renderApp());
+    this.fileSystem.state.subscribe(() => this.render());
 
+<<<<<<< HEAD
 
     // const measures = this.fileSystem.state.get('measures');
     // console.log(measures)
@@ -185,6 +201,13 @@ class ControllerExperience extends AbstractExperience {
 
 
   renderApp() {
+=======
+    window.addEventListener('resize', () => this.render());
+    this.render();
+  }
+
+  render() {
+>>>>>>> 4f1fd27b686b6f7b2d43c36ffec3687c7696d08b
     const medias = this.fileSystem.state.get('medias');
     const recordingsOverview = medias.children;
     const participants = Array.from(this.participants).map(p => p.getValues());
@@ -195,7 +218,47 @@ class ControllerExperience extends AbstractExperience {
         ${this.config.app.name} - ${this.project.get('name')}
       </h1>
       <div class="controller" style="padding: 20px;">
+
+        <!-- participants -->
         <div style="width: 50%; float:left;">
+<<<<<<< HEAD
+=======
+          <h2># participants</h2>
+          ${participants.map(participant => {
+            return html`
+              <div style="
+                padding: 10px;
+                margin: 0 20px 12px 0;
+                background-color: #232323;
+                position: relative;
+              ">
+                <sc-bang
+                  style="position: absolute; top: 4px; right: 4px"
+                  id="packet-feedback-${participant.slug}"
+                ></sc-bang>
+
+                ${Object.keys(participant).map(key => {
+                  if (key === 'annotationPacketSent') {
+                    return nothing;
+                  }
+
+                  return html`
+                    <p>
+                      ${key}:
+                      ${Array.isArray(participant[key]) ?
+                        html`<pre>${JSON.stringify(participant[key], null, 2)}</pre>` :
+                        participant[key]
+                      }
+                    </p>`
+                })}
+              </div>
+            `;
+          })}
+        </div>
+
+        <!-- config -->
+        <div style="width: 50%; float:left;">
+>>>>>>> 4f1fd27b686b6f7b2d43c36ffec3687c7696d08b
           <h2># project config</h2>
           ${Object.keys(project).map(key => {
             return html`<p>${key}: ${Array.isArray(project[key]) ?

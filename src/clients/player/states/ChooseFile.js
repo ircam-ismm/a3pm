@@ -11,36 +11,43 @@ export default class ChooseFile extends State {
 
   async enter() {
     if (!window.DEBUG) {
-      const completedTasks = this.context.participant.get('completedTasks');
+      const currentTaskIndex = this.context.participant.get('currentTaskIndex');
+      const mediaFolder = this.context.project.get('mediaFolder')[currentTaskIndex];
+      const testRecording = this.context.project.get('testRecording')[currentTaskIndex];
+      const mediaOrder = this.context.project.get('mediaOrder')[currentTaskIndex];
+
       const projectFiles = this.context.fileSystem.get('medias');
       const taskFiles = projectFiles.children
-        .filter(leaf => leaf.name === this.context.project.get('mediaFolder')[completedTasks])[0];
+        .find(leaf => leaf.name === mediaFolder);
+
       const recordingsOverview = taskFiles.children
-        .filter(leaf => leaf.name !== this.context.project.get('testRecording')[completedTasks])
+        .filter(leaf => leaf.name !== testRecording)
         .map(leaf => leaf.url); 
+
       const annotatedRecordings = this.context.participant.get('annotatedRecordings');
       const remainingRecordings = recordingsOverview.filter(recording => {
         return !annotatedRecordings.includes(recording);
       });
 
-      const testRecording = taskFiles.children
-        .find(leaf => leaf.name === this.context.project.get('testRecording')[completedTasks]);
+      const testRecordingFile = taskFiles.children
+        .find(leaf => leaf.name === testRecording);
 
+      // if no remaining recordings jump to next task or to end
       if (remainingRecordings.length === 0) {
         // we don't want to await here as the exit would never be called
         this.context.participant.set({ state: 'end' });
       } else {
         //
         if (
-          this.context.project.get('testRecording')[completedTasks] !== null &&
+          this.context.project.get('testRecording')[currentTaskIndex] !== null &&
           this.context.participant.get('testDone') === false
         ) {
           this.context.participant.set({ testing: true });
-          this.setRecording(testRecording.url);
+          this.setRecording(testRecordingFile.url);
         } else {
           // pick next recording
-          const mediaOrder = this.context.project.get('mediaOrder')[completedTasks];
           let index;
+
           switch (mediaOrder) {
             case 'alphabetical':
               index = 0;
@@ -61,10 +68,10 @@ export default class ChooseFile extends State {
 
   render() {
     // @note - only in DEBUG mode
-    const completedTasks = this.context.participant.get('completedTasks');
+    const currentTaskIndex = this.context.participant.get('currentTaskIndex');
     const projectFiles = this.context.fileSystem.get('medias');
     const taskFiles = projectFiles.children
-      .filter(leaf => leaf.name === this.context.project.get('mediaFolder')[completedTasks])[0];
+      .filter(leaf => leaf.name === this.context.project.get('mediaFolder')[currentTaskIndex])[0];
     const recordingsOverview = taskFiles.children.map(leaf => leaf.url);
 
     return html`

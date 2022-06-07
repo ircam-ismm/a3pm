@@ -15,6 +15,31 @@ export default class AnnotateSquare extends AnnotateBase {
     this.onInteractionEnd = this.onInteractionEnd.bind(this);
   }
 
+  async enter() {
+    await super.enter();
+
+    document.body.addEventListener('touchmove', this.onInteractionMove);
+    document.body.addEventListener('touchend', this.onInteractionEnd);
+    document.body.addEventListener('touchcancel', this.onInteractionEnd);
+    document.body.addEventListener('mousemove', this.onInteractionMove);
+    document.body.addEventListener('mouseup', this.onInteractionEnd);
+    document.body.addEventListener('mouseleave', this.onInteractionEnd);
+
+    this.recordPeriodic(0.05);
+  }
+
+  async exit() {
+    document.body.removeEventListener('touchmove', this.onInteractionMove);
+    document.body.removeEventListener('touchend', this.onInteractionEnd);
+    document.body.removeEventListener('touchcancel', this.onInteractionEnd);
+    document.body.removeEventListener('mousemove', this.onInteractionMove);
+    document.body.removeEventListener('mouseup', this.onInteractionEnd);
+    document.body.removeEventListener('mouseleave', this.onInteractionEnd);
+
+    await super.exit();
+  }
+
+
   onInteractionStart(e) {
     e.preventDefault();
 
@@ -25,11 +50,6 @@ export default class AnnotateSquare extends AnnotateBase {
   }
 
   onInteractionMove(e) {
-    // don't try to access loggers when they are closed
-    if (this.status !== 'entered') {
-      return;
-    }
-
     if (this.active) {
       const event = (e.type === 'touchmove' || e.type === 'touchstart') ? e.touches[0] : e;
 
@@ -46,23 +66,17 @@ export default class AnnotateSquare extends AnnotateBase {
 
       if (norm1 > 0) {
         this.position.x = norm1 > 1 ?
-          normDotX/norm1 :
+          normDotX / norm1 :
           normDotX;
 
         this.position.y = norm1 > 1 ?
-          normDotY/norm1 :
+          normDotY / norm1 :
           normDotY;
       } else {
         this.position.x = 0.0;
         this.position.y = 0.0;
       }
 
-      const data = {
-        time: this.context.$mediaPlayer.currentTime,
-        position: Object.assign({}, this.position),
-      };
-
-      this.context.annotationLogger.write(data);
       this.context.render();
     }
   }
@@ -74,34 +88,9 @@ export default class AnnotateSquare extends AnnotateBase {
     }
   }
 
-  async enter() {
-    await super.enter();
-
-    document.body.addEventListener('touchmove', this.onInteractionMove);
-    document.body.addEventListener('touchend', this.onInteractionEnd);
-    document.body.addEventListener('touchcancel', this.onInteractionEnd);
-    document.body.addEventListener('mousemove', this.onInteractionMove);
-    document.body.addEventListener('mouseup', this.onInteractionEnd);
-    document.body.addEventListener('mouseleave', this.onInteractionEnd);
-  }
-
-  async exit() {
-    document.body.removeEventListener('touchmove', this.onInteractionMove);
-    document.body.removeEventListener('touchend', this.onInteractionEnd);
-    document.body.removeEventListener('touchcancel', this.onInteractionEnd);
-    document.body.removeEventListener('mousemove', this.onInteractionMove);
-    document.body.removeEventListener('mouseup', this.onInteractionEnd);
-    document.body.removeEventListener('mouseleave', this.onInteractionEnd);
-
-    await super.exit();
-  }
-
-  /**
-   * @todo - un-hardcode triangle
-   */
   render() {
     const { size, left, top } = getCircleArea();
-    const { recording, tagsOrder, completedTasks } = this.context.participant.getValues();
+    const { recording, tagsOrder, currentTaskIndex } = this.context.participant.getValues();
 
     const testing = this.context.participant.get('testing');
     let title = `${this.texts.title} "${recording}"`;
@@ -112,9 +101,8 @@ export default class AnnotateSquare extends AnnotateBase {
 
     const view = html`
       <p>${title}"</p>
-      <p>${this.context.project.get('instruction')[completedTasks]}</p>
+      <p>${this.context.project.get('instruction')[currentTaskIndex]}</p>
       
-
       <div style="
         position: absolute;
         width: ${size}px;

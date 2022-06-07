@@ -1,9 +1,15 @@
 {
+<<<<<<< HEAD
   name: 'my test triangle project',
+=======
+  name: 'Annotation de la tension expressive (triangle)',
+  language: 'fr',
+>>>>>>> 4f1fd27b686b6f7b2d43c36ffec3687c7696d08b
   tasks: [
     {
       annotationType: 'triangle',
       mediaType: 'audio',
+<<<<<<< HEAD
       mediaFolder: 'task1',
       tags: [
         ['sans', 'avec', 'contre'],
@@ -31,4 +37,13 @@
     }
   ]
   
+=======
+      mediaFolder: 'task-1',
+      instruction: 'Utiliser le curseur pour indiquer en continu le niveau de tension que vous percevez dans la musique',
+      tags: [
+        ['pas de tension', 'très forte tension', 'peut-être'],
+      ],
+    },
+  ],
+>>>>>>> 4f1fd27b686b6f7b2d43c36ffec3687c7696d08b
 }

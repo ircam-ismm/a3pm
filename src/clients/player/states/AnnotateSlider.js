@@ -8,29 +8,22 @@ export default class AnnotateSlider extends AnnotateBase {
   constructor(name, context) {
     super(name, context);
 
-    this.position = 0;
+    this.position = { x: 0 };
   }
 
-  recordPosition(value) {
-    // don't try to access loggers when they are closed
-    if (this.status !== 'entered') {
-      return;
-    }
+  async enter() {
+    await super.enter();
+    this.recordPeriodic(0.05);
+  }
 
-    this.position = value;
-
-    const data = {
-      time: this.context.$mediaPlayer.currentTime,
-      position: this.position,
-    };
-
-    this.context.annotationLogger.write(data);
+  setPosition(value) {
+    this.position.x = value;
     this.context.render();
   }
 
   render() {
     const sliderHeight = 60;
-    const { recording, tagsOrder, completedTasks } = this.context.participant.getValues();
+    const { recording, tagsOrder, currentTaskIndex } = this.context.participant.getValues();
     const { size, left, top } = getSliderArea(sliderHeight);
 
     const testing = this.context.participant.get('testing');
@@ -42,7 +35,7 @@ export default class AnnotateSlider extends AnnotateBase {
 
     const view = html`
       <p>${title}"</p>
-      <p>${this.context.project.get('instruction')[completedTasks]}</p>
+      <p>${this.context.project.get('instruction')[currentTaskIndex]}</p>
 
       <span
         style="position: absolute; top: ${top - 30}px; left: ${left}px; font-size: 1.2rem"
@@ -54,7 +47,7 @@ export default class AnnotateSlider extends AnnotateBase {
         min="0"
         max="1"
         value="${this.position}"
-        @input="${e => this.recordPosition(e.detail.value)}"
+        @input="${e => this.setPosition(e.detail.value)}"
       ></sc-slider>
       <span
         style="position: absolute; top: ${top - 50}px; right: ${left}px; font-size: 1.2rem"

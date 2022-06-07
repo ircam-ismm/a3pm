@@ -17,7 +17,9 @@ echo "### get sources                ###"
 echo "##################################"
 echo ""
 
+git stash
 git pull origin main
+git stash pop
 
 echo ""
 echo "##################################"
