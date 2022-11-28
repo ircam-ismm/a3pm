@@ -5,7 +5,7 @@
     {
       annotationType: 'slider',
       mediaType: 'audio',
-      mediaFolder: 'task-1',
+      mediaFolder: 'task1',
       instruction: 'Utiliser le curseur pour indiquer en continu le niveau de tension que vous percevez dans la musique',
       tags: [
         ['pas de tension', 'très forte tension'],

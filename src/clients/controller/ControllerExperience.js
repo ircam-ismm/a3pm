@@ -2,9 +2,17 @@ import { AbstractExperience } from '@soundworks/core/client';
 import { render, html, nothing } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
 import '@ircam/simple-components/sc-button.js';
-
-
 import '@ircam/simple-components/sc-bang.js';
+import Plotly from 'plotly.js-dist';
+
+/**
+ * @todo: 
+ * - better close button
+ * - close button next to graph
+ * - resize graph possible?
+ * - change font color graphs
+ */
+
 
 class ControllerExperience extends AbstractExperience {
   constructor(client, config, $container) {
@@ -16,6 +24,26 @@ class ControllerExperience extends AbstractExperience {
     this.participants = new Set();
 
     this.fileSystem = this.require('file-system');
+
+    this.graphHeight = 150;
+
+    this.plotGraph = this.plotGraph.bind(this);
+
+    this.zoneColors = {
+      triangle: {
+        top: '#000ffe',
+        right: '#00ee00',
+        left: '#fbea00',
+        center: '#000000'
+      },
+      square: {
+        top: '#d82404',
+        left: '#6ff4f6',
+        bottom: '#1188e5',
+        right: '#cb7cf0',
+        center: '#000000'
+      },
+    }; 
 
     renderInitializationScreens(client, config, $container);
   }
@@ -56,7 +84,8 @@ class ControllerExperience extends AbstractExperience {
 
     this.fileSystem.state.subscribe(() => this.render());
 
-<<<<<<< HEAD
+
+
 
     // const measures = this.fileSystem.state.get('measures');
     // console.log(measures)
@@ -80,7 +109,7 @@ class ControllerExperience extends AbstractExperience {
     const $selectTask = document.createElement('select');
     const $selectName = document.createElement("select");
     const $selectFile = document.createElement("select");
-    for (let t = 1; t <= this.project.get('taskNumber'); t++) {
+    for (let t = 1; t <= this.project.get('numTasks'); t++) {
       const $option = document.createElement('option');
       $option.value = `task${t}`;
       $option.text = `task${t}`;
@@ -145,7 +174,7 @@ class ControllerExperience extends AbstractExperience {
 
     $selBlock.appendChild($validateButton); 
     $selBlock.style.display = 'inline-block';
-    // $selBlock.style.marginTop = '10px';
+    $selBlock.style.marginTop = '30px';
     $newGraph.appendChild($selBlock);
 
     this.renderApp();
@@ -163,7 +192,15 @@ class ControllerExperience extends AbstractExperience {
             console.log(this.project.getValues()); 
             const taskIdx = this.project.get('mediaFolder').indexOf(task) 
             const annotationType = this.project.get('annotationType')[taskIdx];
+            this.graphInfo = {
+              participant: selectedMeasure.name,
+              task: task,
+              file: file,
+              annotationType: annotationType,
+              container: $graphDiv,
+            };
             this.client.socket.send('filePath', measureFile.path);
+            this.client.socket.addListener('parsedData', this.plotGraph);
           }
         }
       }
@@ -185,7 +222,7 @@ class ControllerExperience extends AbstractExperience {
     const $newEmptyGraph = document.createElement("div");
     $newEmptyGraph.style.position = 'relative';
     $newEmptyGraph.style.width = '90%';
-    $newEmptyGraph.style.height = '100px';
+    $newEmptyGraph.style.height = `${this.graphHeight}px`;
     $newEmptyGraph.style.marginTop = '5px';
     $newEmptyGraph.setAttribute("align", "center");
     $newEmptyGraph.setAttribute('id', 'empty-graph')
@@ -195,19 +232,137 @@ class ControllerExperience extends AbstractExperience {
     this.renderApp();
   }
 
-  // plotFile(filePath, annotationType) {
-  //   this.client.socket.send('filePath', filePath);
-  // };
+  plotGraph(data) {
+    console.log(data);
+    const annotationType = this.graphInfo.annotationType;
+    this.client.socket.removeListener('parsedData', this.plotGraph);
+    const bars = [];
+    for (let i = 0; i < data.length - 1; i++) {
+      const line = data[i+1];
+      const prevLine = data[i]
+      const zone = this.getZone(line.position.x, line.position.y, annotationType);
+      const bar = {
+        x: [line.time - prevLine.time],
+        orientation: 'h',
+        name: zone,
+        marker: {
+          color: this.zoneColors[annotationType][zone],
+          width: 1
+        },
+        showlegend: false,
+        type: 'bar'
+      }
+      bars.push(bar);
+    }
+
+    //legend
+    for (const zone of Object.keys(this.zoneColors[annotationType])) {
+      const bar = {
+        x: [0],
+        orientation: 'h',
+        name: zone,
+        marker: {
+          color: this.zoneColors[annotationType][zone],
+          width: 1
+        },
+        showlegend: true,
+        type: 'bar'
+      };
+      bars.push(bar)
+    }
+
+    const layout = {
+      title: {
+        text: this.graphInfo.participant+' '+this.graphInfo.task+' '+this.graphInfo.file,
+        font: {
+          size: 12,
+        },
+      },
+      barmode: 'stack',
+      paper_bgcolor: '#000000',
+      plot_bgcolor: '#000000',
+      margin: {
+        b: 30,
+        l: 0,
+        t: 21,
+        r: 0,
+        pad: 0,
+      }, 
+    };
+    console.log(bars)
+    Plotly.newPlot(this.graphInfo.container, bars, layout);
+
+  };
+
+  getZone(x, y, annotationType) {
+    switch (annotationType) {
+      case 'square':
+        const size = 1020
+        const ellipses = {
+          'top': {
+            'xRad': 422 / size,
+            'yRad': 368 / size
+          },
+          'right': {
+            'xRad': 366 / size,
+            'yRad': 366 / size
+          },
+          'bottom': {
+            'xRad': 422 / size,
+            'yRad': 368 / size
+          },
+          'left': {
+            'xRad': 391 / size,
+            'yRad': 368 / size
+          },
+        }
+        ellipses['top']['xC'] = 0
+        ellipses['top']['yC'] = 1 - ellipses['top']['yRad']
+        ellipses['right']['xC'] = 1 - ellipses['right']['xRad']
+        ellipses['right']['yC'] = 0
+        ellipses['bottom']['xC'] = 0
+        ellipses['bottom']['yC'] = -1 + ellipses['bottom']['yRad']
+        ellipses['left']['xC'] = -1 + ellipses['left']['xRad']
+        ellipses['left']['yC'] = 0
+        for (const pos of ['top', 'right', 'bottom', 'left']) {
+        const  inEllipse = ((x - ellipses[pos]['xC']) ** 2 / ellipses[pos]['xRad'] ** 2) + ((y - ellipses[pos]['yC']) ** 2 / ellipses[pos]['yRad'] ** 2) < 1
+          if (inEllipse) {
+            return pos
+          }
+        }
+        return 'center' 
+        break;
+      case 'triangle': 
+        // Positions of each vertex(top, bottom right, bottom left)
+        const vertices = {
+          top: {
+            x: 0,
+            y: 1,
+          },
+          left: {
+            x: -0.88,
+            y: -0.47,
+          },
+          right: {
+            x: 0.88,
+            y: -0.47,
+          }
+        }
+        const thresh = 0.75
+        for (const pos of ['top', 'left', 'right']) {
+          const norm = Math.sqrt((x - vertices[pos].x)**2 + (y - vertices[pos].y)**2);
+          if (norm < thresh) {
+            return pos;
+          }
+        }
+        return 'center'
+        break;
+    }
+  }
+    
 
 
   renderApp() {
-=======
-    window.addEventListener('resize', () => this.render());
-    this.render();
-  }
-
-  render() {
->>>>>>> 4f1fd27b686b6f7b2d43c36ffec3687c7696d08b
     const medias = this.fileSystem.state.get('medias');
     const recordingsOverview = medias.children;
     const participants = Array.from(this.participants).map(p => p.getValues());
@@ -221,44 +376,6 @@ class ControllerExperience extends AbstractExperience {
 
         <!-- participants -->
         <div style="width: 50%; float:left;">
-<<<<<<< HEAD
-=======
-          <h2># participants</h2>
-          ${participants.map(participant => {
-            return html`
-              <div style="
-                padding: 10px;
-                margin: 0 20px 12px 0;
-                background-color: #232323;
-                position: relative;
-              ">
-                <sc-bang
-                  style="position: absolute; top: 4px; right: 4px"
-                  id="packet-feedback-${participant.slug}"
-                ></sc-bang>
-
-                ${Object.keys(participant).map(key => {
-                  if (key === 'annotationPacketSent') {
-                    return nothing;
-                  }
-
-                  return html`
-                    <p>
-                      ${key}:
-                      ${Array.isArray(participant[key]) ?
-                        html`<pre>${JSON.stringify(participant[key], null, 2)}</pre>` :
-                        participant[key]
-                      }
-                    </p>`
-                })}
-              </div>
-            `;
-          })}
-        </div>
-
-        <!-- config -->
-        <div style="width: 50%; float:left;">
->>>>>>> 4f1fd27b686b6f7b2d43c36ffec3687c7696d08b
           <h2># project config</h2>
           ${Object.keys(project).map(key => {
             return html`<p>${key}: ${Array.isArray(project[key]) ?
@@ -309,7 +426,7 @@ class ControllerExperience extends AbstractExperience {
             style="
              position: relative;
              width: 90%;
-             height: 100px;
+             height: ${this.graphHeight}px;
             "
             align="center"
           >

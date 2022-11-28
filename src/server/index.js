@@ -132,7 +132,6 @@ server.stateManager.registerSchema('participant', participantSchema);
     })
 
 
-    setTimeout(() => console.log(project.getValues()), 1000);
 
     // if for some reason, a participant reload we want to restore it's state
     // according to its given name.

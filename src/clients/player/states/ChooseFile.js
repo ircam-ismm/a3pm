@@ -20,6 +20,8 @@ export default class ChooseFile extends State {
       const taskFiles = projectFiles.children
         .find(leaf => leaf.name === mediaFolder);
 
+      console.log(currentTaskIndex, mediaFolder, testRecording, mediaOrder);
+      console.log(projectFiles);
       const recordingsOverview = taskFiles.children
         .filter(leaf => leaf.name !== testRecording)
         .map(leaf => leaf.url); 

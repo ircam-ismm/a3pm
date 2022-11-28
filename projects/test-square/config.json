@@ -6,7 +6,7 @@
       instruction: 'Tâche numero 1',
       annotationType: 'square',
       mediaType: 'audio',
-      mediaFolder: 'task-1',
+      mediaFolder: 'task1',
       mediaOrder: 'random',
       tags: [
         ['top', 'right', 'bottom', 'left'],

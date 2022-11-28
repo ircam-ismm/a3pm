@@ -12,9 +12,5 @@
     },
   },
 
-<<<<<<< HEAD
-  project: 'test-triangle',
-=======
-  project: 'test-square',
->>>>>>> 4f1fd27b686b6f7b2d43c36ffec3687c7696d08b
+  project: 'test-slider',
 }
