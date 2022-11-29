@@ -30,6 +30,11 @@ class ControllerExperience extends AbstractExperience {
     this.plotGraph = this.plotGraph.bind(this);
 
     this.zoneColors = {
+      slider: {
+        left: '#000ffe',
+        right: '#fbea00',
+        center: '#000000'
+      },
       triangle: {
         top: '#000ffe',
         right: '#00ee00',
@@ -51,7 +56,10 @@ class ControllerExperience extends AbstractExperience {
   async start() {
     super.start();
 
+
     this.project = await this.client.stateManager.attach('project');
+
+    console.log(this.project.getValues());
 
     this.client.stateManager.observe(async (schemaName, stateId) => {
       if (schemaName === 'participant') {
@@ -59,7 +67,7 @@ class ControllerExperience extends AbstractExperience {
 
         participant.onDetach(() => {
           this.participants.delete(participant);
-          this.render();
+          this.renderApp();
         });
 
         let $packetFeedbackBang = null;
@@ -74,15 +82,15 @@ class ControllerExperience extends AbstractExperience {
             $packetFeedbackBang.active = true;
           }
 
-          this.render();
+          this.renderApp();
         });
 
         this.participants.add(participant);
-        this.render();
+        this.renderApp();
       }
     });
 
-    this.fileSystem.state.subscribe(() => this.render());
+    this.fileSystem.state.subscribe(() => this.renderApp());
 
 
 
@@ -103,6 +111,7 @@ class ControllerExperience extends AbstractExperience {
     $newGraph.removeAttribute('id') 
 
     // add selects
+    const mediaFolders = this.project.get('mediaFolder');
     const measures = this.fileSystem.state.get('measures');
     const medias = this.fileSystem.state.get('medias');
     const $selBlock = document.createElement('div');
@@ -111,8 +120,8 @@ class ControllerExperience extends AbstractExperience {
     const $selectFile = document.createElement("select");
     for (let t = 1; t <= this.project.get('numTasks'); t++) {
       const $option = document.createElement('option');
-      $option.value = `task${t}`;
-      $option.text = `task${t}`;
+      $option.value = `${t}`;
+      $option.text = `task-${t}`;
       $selectTask.appendChild($option);
     }
     for (const el of measures.children) {
@@ -123,10 +132,11 @@ class ControllerExperience extends AbstractExperience {
         $selectName.appendChild($option);
       }
     }
-    const selectedTask = $selectTask.value;
+    const selectedTaskNum = $selectTask.value;
+    const taskMediaFolder = mediaFolders[selectedTaskNum-1];
     let mediaFilesTask;
     for (const folder of medias.children) {
-      if (folder.name === selectedTask) {
+      if (folder.name === taskMediaFolder) {
         mediaFilesTask = folder.children
       }
     }
@@ -147,9 +157,10 @@ class ControllerExperience extends AbstractExperience {
     // update medias when changing task
     $selectTask.addEventListener('change', (e) => {
       $selectFile.replaceChildren();
+      const taskMediaFolder = mediaFolders[e.target.value - 1];
       let mediaFilesTask;
       for (const folder of medias.children) {
-        if (folder.name === e.target.value) {
+        if (folder.name === taskMediaFolder) {
           mediaFilesTask = folder.children
         }
       }
@@ -180,13 +191,13 @@ class ControllerExperience extends AbstractExperience {
     this.renderApp();
   }
 
-  selectGraph(folderIndex, task, file, $graphDiv, $selBlock) {
+  selectGraph(folderIndex, taskNum, file, $graphDiv, $selBlock) {
     $selBlock.remove();
     //Open file
     const measures = this.fileSystem.state.get('measures');
     const selectedMeasure = measures.children[folderIndex];
     for (const taskFolder of selectedMeasure.children) {
-      if (taskFolder.name === task) {
+      if (taskFolder.name === `task${taskNum}`) {
         let metasFile, measureFile;
         for (const folderFile of taskFolder.children) {
           if (folderFile.name.includes(file)) {
@@ -196,11 +207,10 @@ class ControllerExperience extends AbstractExperience {
             metasFile = folderFile;
           }
         }
-        const taskIdx = this.project.get('mediaFolder').indexOf(task)
-        const annotationType = this.project.get('annotationType')[taskIdx];
+        const annotationType = this.project.get('annotationType')[taskNum-1];
         this.graphInfo = {
           participant: selectedMeasure.name,
-          task: task,
+          task: taskNum,
           file: file,
           annotationType: annotationType,
           container: $graphDiv,
@@ -243,20 +253,19 @@ class ControllerExperience extends AbstractExperience {
   plotGraph(data) {
     const annotationType = this.graphInfo.annotationType;
     const tagsOrder = data.tagsOrder;
-    console.log(tagsOrder);
     const measures = data.measures;
     this.client.socket.removeListener('parsedData', this.plotGraph);
     const bars = [];
     for (let i = 0; i < measures.length - 1; i++) {
       const line = measures[i+1];
       const prevLine = measures[i]
-      const zone = this.getZone(line.position.x, line.position.y, annotationType);
+      const {zone, color} = this.getZoneColor(line.position.x, line.position.y, annotationType, 'solid');
       const bar = {
         x: [line.time - prevLine.time],
         orientation: 'h',
         name: zone,
         marker: {
-          color: this.zoneColors[annotationType][zone],
+          color: color,
           width: 1
         },
         showlegend: false,
@@ -287,6 +296,7 @@ class ControllerExperience extends AbstractExperience {
         text: this.graphInfo.participant+' '+this.graphInfo.task+' '+this.graphInfo.file,
         font: {
           size: 12,
+          color: '#FFFFFF'
         },
       },
       legend: {
@@ -310,8 +320,127 @@ class ControllerExperience extends AbstractExperience {
 
   };
 
+  getZoneColor(x, y, annotationType, colorType) {
+    let zone, color;
+    switch (annotationType) {
+      case 'slider':
+        if (x > 0.5) {
+          zone = 'right'
+        } else if (x < 0.5) {
+          zone = 'left'
+        } else {
+          zone = 'center'
+          color = this.zoneColors[annotationType][zone];
+        }
+        if (colorType === "solid") {
+          color = this.zoneColors[annotationType][zone];
+        } else {
+          if (zone === 'right') {
+            const alpha = 2*(x - 0.5) * 255;
+            color = `${this.zoneColors[annotationType][zone]}${alpha.toString(16)}`;
+          } else if (zone === 'left') {
+            const alpha = 2 * (0.5 - x) * 255;
+            color = `${this.zoneColors[annotationType][zone]}${alpha.toString(16)}`;
+          }
+        }
+        break;
+      case 'square':
+        const size = 1020
+        const ellipses = {
+          'top': {
+            'xRad': 422 / size,
+            'yRad': 368 / size
+          },
+          'right': {
+            'xRad': 366 / size,
+            'yRad': 366 / size
+          },
+          'bottom': {
+            'xRad': 422 / size,
+            'yRad': 368 / size
+          },
+          'left': {
+            'xRad': 391 / size,
+            'yRad': 368 / size
+          },
+        }
+        ellipses['top']['xC'] = 0
+        ellipses['top']['yC'] = 1 - ellipses['top']['yRad']
+        ellipses['right']['xC'] = 1 - ellipses['right']['xRad']
+        ellipses['right']['yC'] = 0
+        ellipses['bottom']['xC'] = 0
+        ellipses['bottom']['yC'] = -1 + ellipses['bottom']['yRad']
+        ellipses['left']['xC'] = -1 + ellipses['left']['xRad']
+        ellipses['left']['yC'] = 0
+        // default : center
+        zone = 'center'
+        color = this.zoneColors[annotationType][zone];
+        // check if in another zone
+        for (const pos of ['top', 'right', 'bottom', 'left']) {
+          const distVertex = ((x - ellipses[pos]['xC']) ** 2 / ellipses[pos]['xRad'] ** 2) + ((y - ellipses[pos]['yC']) ** 2 / ellipses[pos]['yRad'] ** 2);
+          if (distVertex < 1) {
+            zone = pos;
+            if (colorType === 'solid') {
+              color = this.zoneColors[annotationType][zone];
+            } else {
+              const alpha = (1-distVertex) * 255;
+              color = `${this.zoneColors[annotationType][zone]}${alpha.toString(16)}`;
+            }
+          }
+        }
+        break;
+      case 'triangle':
+        // Positions of each vertex(top, bottom right, bottom left)
+        const vertices = {
+          top: {
+            x: 0,
+            y: 1,
+          },
+          left: {
+            x: -0.88,
+            y: -0.47,
+          },
+          right: {
+            x: 0.88,
+            y: -0.47,
+          }
+        };
+        const thresh = 0.75;
+        // default : center
+        zone = 'center'
+        color = this.zoneColors[annotationType][zone];
+        // check if in another zone
+        for (const pos of ['top', 'left', 'right']) {
+          const norm = Math.sqrt((x - vertices[pos].x) ** 2 + (y - vertices[pos].y) ** 2);
+          if (norm < thresh) {
+            zone = pos;
+            if (colorType === 'solid') {
+              color = this.zoneColors[annotationType][zone];
+            } else {
+              const alpha = (thresh - norm)/thresh * 255;
+              color = `${this.zoneColors[annotationType][zone]}${alpha.toString(16)}`;
+            }
+          }
+        }
+        break;
+    }
+    return {
+      zone,
+      color
+    }
+  }
+
   getZone(x, y, annotationType) {
     switch (annotationType) {
+      case 'slider':
+          if (x > 0.5) {
+            return 'right'
+          } else if (x < 0.5) {
+            return 'left'
+          } else {
+            return 'center'
+          }
+        break;
       case 'square':
         const size = 1020
         const ellipses = {

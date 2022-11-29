@@ -25,6 +25,15 @@
       ],
       testRecording: 'test.wav',
     },
+    {
+      annotationType: 'slider',
+      mediaType: 'audio',
+      mediaFolder: 'task2',
+      tags: [
+        ['bien', 'pas bien'],
+      ],
+      testRecording: 'test.wav',
+    },
   ]
   
 }

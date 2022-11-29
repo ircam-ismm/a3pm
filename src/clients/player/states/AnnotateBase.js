@@ -33,8 +33,8 @@ export default class AnnotateBase extends State {
 
     const mediaFolder = this.context.project.get('mediaFolder')[currentTaskIndex];
     const filename = testing ?
-      `${folder}/${mediaFolder}/${name}_${cleanBasename(recording)}-test.txt` :
-      `${folder}/${mediaFolder}/${name}_${cleanBasename(recording)}.txt`;
+      `${folder}/task${currentTaskIndex + 1}/${name}_${cleanBasename(recording)}-test.txt` :
+      `${folder}/task${currentTaskIndex + 1}/${name}_${cleanBasename(recording)}.txt`;
 
     this.context.annotationLogger = await this.context.logger.create(filename, {
       bufferSize: 20 * 2, // send a buffer every two seconds

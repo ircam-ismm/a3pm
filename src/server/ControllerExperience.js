@@ -23,9 +23,9 @@ class PlayerExperience extends AbstractExperience {
       
       // fetch tags order
       let tagsOrder;
-      fs.readFile(paths.metas, 'utf8', (err, data) => {
-        tagsOrder = data.split(': ')[1].split(','); // better remove space with regexp ?
-      });
+      const fileContent = fs.readFileSync(paths.metas, {encoding: 'utf8'});
+      tagsOrder = fileContent.split(': ')[1].split(','); // better remove space with regexp ?
+
 
       // fetch measures
       const parsedData = [];
@@ -43,7 +43,8 @@ class PlayerExperience extends AbstractExperience {
       for await (const line of rdMeasures) {
         parsedData.push(JSON.parse(line));
       }
-
+    
+      
       // console.log(parsedData);
       // setTimeout(() => console.log(parsedData), 1000);
       client.socket.send('parsedData', {

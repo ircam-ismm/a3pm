@@ -6,7 +6,7 @@ export default class StartTask extends State {
   async exit() {
     const { folder, slug, currentTaskIndex } = this.context.participant.getValues();
     this.context.taskMetasLogger = await this.context.logger.create(
-      `${folder}/task${currentTaskIndex}/task-metas-${slug}.txt`);
+      `${folder}/task${currentTaskIndex + 1}/task-metas-${slug}.txt`);
   }
 
   render() {
