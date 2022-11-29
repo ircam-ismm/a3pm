@@ -16,14 +16,14 @@ class PlayerExperience extends AbstractExperience {
   enter(client) {
     super.enter(client);
 
-    client.socket.addListener('filePath', async paths => {
+    client.socket.addListener('getGraph', async data => {
       // console.log(path);
       // const fileContent = fs.readFileSync(path, { encoding: 'utf8', flag: 'r' });
       // console.log(JSON.parse(fileContent));
       
       // fetch tags order
       let tagsOrder;
-      const fileContent = fs.readFileSync(paths.metas, {encoding: 'utf8'});
+      const fileContent = fs.readFileSync(data.filesPath.metas, {encoding: 'utf8'});
       tagsOrder = fileContent.split(': ')[1].split(','); // better remove space with regexp ?
 
 
@@ -31,7 +31,7 @@ class PlayerExperience extends AbstractExperience {
       const parsedData = [];
 
       var rdMeasures = readline.createInterface({
-        input: fs.createReadStream(paths.measures),
+        input: fs.createReadStream(data.filesPath.measures),
         output: process.stdout,
         console: false
       });
@@ -48,8 +48,9 @@ class PlayerExperience extends AbstractExperience {
       // console.log(parsedData);
       // setTimeout(() => console.log(parsedData), 1000);
       client.socket.send('parsedData', {
+        graphId: data.graphId,
         tagsOrder,
-        measures: parsedData
+        data: parsedData
       });
     });
   }

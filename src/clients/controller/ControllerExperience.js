@@ -29,6 +29,9 @@ class ControllerExperience extends AbstractExperience {
 
     this.plotGraph = this.plotGraph.bind(this);
 
+    this.graphCounter = 0;
+    this.graphInfos = {};
+
     this.zoneColors = {
       slider: {
         left: '#000ffe',
@@ -60,6 +63,12 @@ class ControllerExperience extends AbstractExperience {
     this.project = await this.client.stateManager.attach('project');
 
     console.log(this.project.getValues());
+
+    this.client.socket.addListener('parsedData', e => {
+      this.graphInfos[e.graphId].tagsOrder = e.tagsOrder;
+      this.graphInfos[e.graphId].data = e.data;
+      this.plotGraph(e.graphId);
+    });
 
     this.client.stateManager.observe(async (schemaName, stateId) => {
       if (schemaName === 'participant') {
@@ -108,7 +117,8 @@ class ControllerExperience extends AbstractExperience {
 
     const $newGraph = document.querySelector('#empty-graph');
     $newGraph.style.backgroundColor = '#1d1d1d';
-    $newGraph.removeAttribute('id') 
+    $newGraph.id = `graph-${this.graphCounter}`;
+    this.graphCounter++;
 
     // add selects
     const mediaFolders = this.project.get('mediaFolder');
@@ -209,19 +219,24 @@ class ControllerExperience extends AbstractExperience {
           }
         }
         const annotationType = this.project.get('annotationType')[taskNum-1];
-        this.graphInfo = {
+        const graphId = $graphDiv.id;
+        this.graphInfos[graphId] = {
           participant: selectedMeasure.name,
           task: taskNum,
           file: file,
           annotationType: annotationType,
           container: $graphDiv,
+          colorType: 'solid',
         };
         const filesPath = {
           metas: metasFile.path,
           measures: measureFile.path,
         }
-        this.client.socket.send('filePath', filesPath);
-        this.client.socket.addListener('parsedData', this.plotGraph);
+        this.client.socket.send('getGraph', {
+          graphId,
+          filesPath
+        });
+        
       }
     }
     
@@ -248,19 +263,36 @@ class ControllerExperience extends AbstractExperience {
     $container.appendChild($newEmptyGraph);
     $newEmptyGraph.appendChild(this.$addButton);
 
+    // switch color mode
+    const $colorModeButton = document.createElement('sc-button');
+    $colorModeButton.setAttribute('text', 'color mode');
+    $colorModeButton.setAttribute('width', '120');
+    $colorModeButton.setAttribute('height', '20');
+    $colorModeButton.style.position = 'absolute';
+    $colorModeButton.style.top = '0';
+    $colorModeButton.style.left = '0%';
+    $colorModeButton.addEventListener('input', e => {
+      Plotly.purge($graphDiv);
+      const graphId = e.target.parentElement.id;
+      const curColorMode = this.graphInfos[graphId].colorType;
+      this.graphInfos[graphId].colorType = curColorMode === 'solid' ? 'transparent' : 'solid'; 
+      this.plotGraph(graphId);
+    });
+    $graphDiv.appendChild($colorModeButton);
+
     this.render();
   }
 
-  plotGraph(data) {
-    const annotationType = this.graphInfo.annotationType;
-    const tagsOrder = data.tagsOrder;
-    const measures = data.measures;
+  plotGraph(graphId) {
+    const graphInfo = this.graphInfos[graphId];
+    const annotationType = graphInfo.annotationType;
+    const tagsOrder = graphInfo.tagsOrder;
     this.client.socket.removeListener('parsedData', this.plotGraph);
     const bars = [];
-    for (let i = 0; i < measures.length - 1; i++) {
-      const line = measures[i+1];
-      const prevLine = measures[i]
-      const {zone, color} = this.getZoneColor(line.position.x, line.position.y, annotationType, 'solid');
+    for (let i = 0; i < graphInfo.data.length - 1; i++) {
+      const line = graphInfo.data[i+1];
+      const prevLine = graphInfo.data[i]
+      const { zone, color } = this.getZoneColor(line.position.x, line.position.y, annotationType, graphInfo.colorType);
       const bar = {
         x: [line.time - prevLine.time],
         orientation: 'h',
@@ -294,7 +326,7 @@ class ControllerExperience extends AbstractExperience {
 
     const layout = {
       title: {
-        text: this.graphInfo.participant+' '+this.graphInfo.task+' '+this.graphInfo.file,
+        text: `${graphInfo.participant} - task${graphInfo.task} - ${graphInfo.file}`,
         font: {
           size: 12,
           color: '#FFFFFF'
@@ -317,7 +349,7 @@ class ControllerExperience extends AbstractExperience {
         pad: 0,
       }, 
     };
-    Plotly.newPlot(this.graphInfo.container, bars, layout);
+    Plotly.newPlot(graphInfo.container, bars, layout, {responsive: true});
 
   };
 
@@ -338,10 +370,14 @@ class ControllerExperience extends AbstractExperience {
         } else {
           if (zone === 'right') {
             const alpha = 2*(x - 0.5) * 255;
-            color = `${this.zoneColors[annotationType][zone]}${alpha.toString(16)}`;
+            let alphaString = parseInt(alpha).toString(16);
+            alphaString = alphaString.length === 1 ? `0${alphaString}` : alphaString;
+            color = `${this.zoneColors[annotationType][zone]}${alphaString}`;
           } else if (zone === 'left') {
             const alpha = 2 * (0.5 - x) * 255;
-            color = `${this.zoneColors[annotationType][zone]}${alpha.toString(16)}`;
+            let alphaString = parseInt(alpha).toString(16);
+            alphaString = alphaString.length === 1 ? `0${alphaString}` : alphaString;
+            color = `${this.zoneColors[annotationType][zone]}${alphaString}`;
           }
         }
         break;
@@ -385,7 +421,9 @@ class ControllerExperience extends AbstractExperience {
               color = this.zoneColors[annotationType][zone];
             } else {
               const alpha = (1-distVertex) * 255;
-              color = `${this.zoneColors[annotationType][zone]}${alpha.toString(16)}`;
+              let alphaString = parseInt(alpha).toString(16);
+              alphaString = alphaString.length === 1 ? `0${alphaString}` : alphaString;
+              color = `${this.zoneColors[annotationType][zone]}${alphaString}`;
             }
           }
         }
@@ -419,7 +457,9 @@ class ControllerExperience extends AbstractExperience {
               color = this.zoneColors[annotationType][zone];
             } else {
               const alpha = (thresh - norm)/thresh * 255;
-              color = `${this.zoneColors[annotationType][zone]}${alpha.toString(16)}`;
+              let alphaString = parseInt(alpha).toString(16);
+              alphaString = alphaString.length === 1 ? `0${alphaString}` : alphaString;
+              color = `${this.zoneColors[annotationType][zone]}${alphaString}`;
             }
           }
         }
