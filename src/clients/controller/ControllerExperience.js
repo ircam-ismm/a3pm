@@ -56,7 +56,11 @@ class ControllerExperience extends AbstractExperience {
   async start() {
     super.start();
 
+<<<<<<< HEAD
 
+=======
+    this.globals = await this.client.stateManager.attach('globals');
+>>>>>>> 5e0ad53c81dac1252dcb6b0b13a6f047f3cd2ad1
     this.project = await this.client.stateManager.attach('project');
 
     console.log(this.project.getValues());
@@ -98,8 +102,8 @@ class ControllerExperience extends AbstractExperience {
     // const measures = this.fileSystem.state.get('measures');
     // console.log(measures)
 
-    window.addEventListener('resize', () => this.renderApp());
-    this.renderApp();
+    window.addEventListener('resize', () => this.render());
+    this.render();
   }
 
   addGraph() {
@@ -118,6 +122,7 @@ class ControllerExperience extends AbstractExperience {
     const $selectTask = document.createElement('select');
     const $selectName = document.createElement("select");
     const $selectFile = document.createElement("select");
+
     for (let t = 1; t <= this.project.get('numTasks'); t++) {
       const $option = document.createElement('option');
       $option.value = `${t}`;
@@ -188,7 +193,7 @@ class ControllerExperience extends AbstractExperience {
     $selBlock.style.marginTop = '30px';
     $newGraph.appendChild($selBlock);
 
-    this.renderApp();
+    this.render();
   }
 
   selectGraph(folderIndex, taskNum, file, $graphDiv, $selBlock) {
@@ -247,7 +252,7 @@ class ControllerExperience extends AbstractExperience {
     $container.appendChild($newEmptyGraph);
     $newEmptyGraph.appendChild(this.$addButton);
 
-    this.renderApp();
+    this.render();
   }
 
   plotGraph(data) {
@@ -507,28 +512,39 @@ class ControllerExperience extends AbstractExperience {
     
 
 
-  renderApp() {
+  render() {
     const medias = this.fileSystem.state.get('medias');
     const recordingsOverview = medias.children;
     const participants = Array.from(this.participants).map(p => p.getValues());
     const project = this.project.getValues();
 
     render(html`
-      <h1 style="margin: 0; padding: 20px; background-color: #232323;">
-        ${this.config.app.name} - ${this.project.get('name')}
-      </h1>
+      <header>
+        <h1 style="margin: 0; padding: 20px; background-color: #232323;">
+          ${this.config.app.name} - ${this.project.get('name')}
+        </h1>
+        <div style="position: absolute; top: 0; right: 10px; text-align: right;">
+          <p style="font-size: 10px;">${this.globals.get('link')}</p>
+          <img src="${this.globals.get('QRCode')}" />
+        </div>
+      </header>
       <div class="controller" style="padding: 20px;">
 
-        <!-- participants -->
-        <div style="width: 50%; float:left;">
+        <!-- project -->
+        <div style="width: 49%; float:left;">
           <h2># project config</h2>
           ${Object.keys(project).map(key => {
-            return html`<p>${key}: ${Array.isArray(project[key]) ?
-              project[key].map(entry => html`
-                <span style="display: block; margin-left: 40px">${JSON.stringify(entry)}</span>
-              `) :
-              html`${project[key]}`
-              }</p>`
+            return html`
+              <p>
+                <span style="display: inline-block; width: 100px;">${key}:</span>
+                ${Array.isArray(project[key]) ?
+                  project[key].map(entry => html`
+                    <p style="display: block; margin-left: 40px">${JSON.stringify(entry, null, 2)}</p>
+                  `) :
+                  html`${project[key]}`
+                }
+              </p>
+            `;
           })}
 
           <h2># media files</h2>
@@ -544,7 +560,7 @@ class ControllerExperience extends AbstractExperience {
           })}
         </div>
 
-        <div style="width: 50%; float:left;">
+        <div style="width: 50%; float:right;">
           <h2># participants</h2>
           ${participants.map(participant => {
             return html`
@@ -564,7 +580,15 @@ class ControllerExperience extends AbstractExperience {
           })}
         </div>
 
-        <div id="graphs-container" style="width: 50%; float:top;">
+        <div id="graphs-container"
+          style="
+            width: 100%;
+            clear: both;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid white;
+          "
+        >
           <h2># graphs</h2>
           <div 
             id="empty-graph"

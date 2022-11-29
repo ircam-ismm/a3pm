@@ -1,5 +1,5 @@
 {
-  "name": "Mica",
+  "name": "A3PM",
   "authors": [
     "Benjamin Matuszewski"
   ],
@@ -12,7 +12,7 @@
     "clean": "soundworks-template-build -c",
     "watch-process": "soundworks-template-build -p",
     "watch-process:inspect": "soundworks-template-build -i -p",
-    "dev": "npm run build && (concurrently -p \"none\" \"npm run watch-process:inspect server\" \"soundworks-template-build -b -w\")",
+    "dev": "npm run build && (concurrently -p \"none\" \"npm run watch-process server\" \"soundworks-template-build -b -w\")",
     "postinstall": "run-script-os",
     "postinstall:default": "mkdir -p .vendors/public && cp -R node_modules/@webcomponents/webcomponentsjs .vendors/public",
     "postinstall:win32": "Xcopy /E /I /H /Y node_modules\\@webcomponents\\webcomponentsjs .vendors\\public",
@@ -31,6 +31,8 @@
     "lit-html": "^1.4.0",
     "node-wav": "0.0.2",
     "plotly.js-dist": "^2.12.1",
+    "prompts": "^2.4.2",
+    "qrcode": "^1.5.1",
     "regenerator-runtime": "^0.13.7",
     "serve-static": "^1.14.1",
     "slugify": "^1.6.2",
