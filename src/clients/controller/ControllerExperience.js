@@ -56,11 +56,7 @@ class ControllerExperience extends AbstractExperience {
   async start() {
     super.start();
 
-<<<<<<< HEAD
-
-=======
     this.globals = await this.client.stateManager.attach('globals');
->>>>>>> 5e0ad53c81dac1252dcb6b0b13a6f047f3cd2ad1
     this.project = await this.client.stateManager.attach('project');
 
     console.log(this.project.getValues());
