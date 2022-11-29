@@ -3,6 +3,12 @@ import { html } from 'lit-html';
 
 export default class StartTask extends State {
 
+  async exit() {
+    const { folder, slug, currentTaskIndex } = this.context.participant.getValues();
+    this.context.taskMetasLogger = await this.context.logger.create(
+      `${folder}/task${currentTaskIndex}/task-metas-${slug}.txt`);
+  }
+
   render() {
     const currentTaskIndex = this.context.participant.get('currentTaskIndex');
 

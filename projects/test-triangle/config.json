@@ -15,6 +15,16 @@
       ],
       testRecording: 'test.wav',
     },
+    {
+      annotationType: 'square',
+      mediaType: 'audio',
+      mediaFolder: 'task2',
+      tags: [
+        ['Paris', 'Nantes', 'Nanterre', 'Montreuil'],
+        ['Montreuil', 'Paris', 'Nantes', 'Nanterre'],
+      ],
+      testRecording: 'test.wav',
+    },
   ]
   
 }

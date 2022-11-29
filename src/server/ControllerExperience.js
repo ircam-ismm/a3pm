@@ -16,15 +16,22 @@ class PlayerExperience extends AbstractExperience {
   enter(client) {
     super.enter(client);
 
-    client.socket.addListener('filePath', async path => {
+    client.socket.addListener('filePath', async paths => {
       // console.log(path);
       // const fileContent = fs.readFileSync(path, { encoding: 'utf8', flag: 'r' });
       // console.log(JSON.parse(fileContent));
+      
+      // fetch tags order
+      let tagsOrder;
+      fs.readFile(paths.metas, 'utf8', (err, data) => {
+        tagsOrder = data.split(': ')[1].split(','); // better remove space with regexp ?
+      });
 
+      // fetch measures
       const parsedData = [];
 
-      var rd = readline.createInterface({
-        input: fs.createReadStream(path),
+      var rdMeasures = readline.createInterface({
+        input: fs.createReadStream(paths.measures),
         output: process.stdout,
         console: false
       });
@@ -33,14 +40,16 @@ class PlayerExperience extends AbstractExperience {
       //   parsedData.push(JSON.parse(line));
       // });
 
-      for await (const line of rd) {
+      for await (const line of rdMeasures) {
         parsedData.push(JSON.parse(line));
       }
 
       // console.log(parsedData);
       // setTimeout(() => console.log(parsedData), 1000);
-      client.socket.send('parsedData', parsedData);
-
+      client.socket.send('parsedData', {
+        tagsOrder,
+        measures: parsedData
+      });
     });
   }
 

@@ -35,6 +35,8 @@ export default class ConfigureTags extends State {
       `${now} - ${name} - task: ${currentTaskIndex + 1} - tagsOrder: ${tagsOrder}`);
     this.context.metasLogger.write(
       `${now} - task: ${currentTaskIndex + 1} - tagsOrder: ${tagsOrder}`);
+    this.context.taskMetasLogger.write(
+      `tagsOrder: ${ tagsOrder }`); 
   }
 
   render() {

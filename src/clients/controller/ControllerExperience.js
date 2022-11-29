@@ -38,9 +38,9 @@ class ControllerExperience extends AbstractExperience {
       },
       square: {
         top: '#d82404',
-        left: '#6ff4f6',
-        bottom: '#1188e5',
         right: '#cb7cf0',
+        bottom: '#1188e5',
+        left: '#6ff4f6',
         center: '#000000'
       },
     }; 
@@ -119,7 +119,7 @@ class ControllerExperience extends AbstractExperience {
       if (el.type === 'directory') {
         const $option = document.createElement('option');
         $option.value = measures.children.indexOf(el);
-        $option.text = el.name;
+        $option.text = el.name.split('-')[2];
         $selectName.appendChild($option);
       }
     }
@@ -187,22 +187,30 @@ class ControllerExperience extends AbstractExperience {
     const selectedMeasure = measures.children[folderIndex];
     for (const taskFolder of selectedMeasure.children) {
       if (taskFolder.name === task) {
-        for (const measureFile of taskFolder.children) {
-          if (measureFile.name.includes(file)) {
-            console.log(this.project.getValues()); 
-            const taskIdx = this.project.get('mediaFolder').indexOf(task) 
-            const annotationType = this.project.get('annotationType')[taskIdx];
-            this.graphInfo = {
-              participant: selectedMeasure.name,
-              task: task,
-              file: file,
-              annotationType: annotationType,
-              container: $graphDiv,
-            };
-            this.client.socket.send('filePath', measureFile.path);
-            this.client.socket.addListener('parsedData', this.plotGraph);
+        let metasFile, measureFile;
+        for (const folderFile of taskFolder.children) {
+          if (folderFile.name.includes(file)) {
+            measureFile = folderFile;
+          }
+          if (folderFile.name.includes('task-metas')) {
+            metasFile = folderFile;
           }
         }
+        const taskIdx = this.project.get('mediaFolder').indexOf(task)
+        const annotationType = this.project.get('annotationType')[taskIdx];
+        this.graphInfo = {
+          participant: selectedMeasure.name,
+          task: task,
+          file: file,
+          annotationType: annotationType,
+          container: $graphDiv,
+        };
+        const filesPath = {
+          metas: metasFile.path,
+          measures: measureFile.path,
+        }
+        this.client.socket.send('filePath', filesPath);
+        this.client.socket.addListener('parsedData', this.plotGraph);
       }
     }
     
@@ -233,13 +241,15 @@ class ControllerExperience extends AbstractExperience {
   }
 
   plotGraph(data) {
-    console.log(data);
     const annotationType = this.graphInfo.annotationType;
+    const tagsOrder = data.tagsOrder;
+    console.log(tagsOrder);
+    const measures = data.measures;
     this.client.socket.removeListener('parsedData', this.plotGraph);
     const bars = [];
-    for (let i = 0; i < data.length - 1; i++) {
-      const line = data[i+1];
-      const prevLine = data[i]
+    for (let i = 0; i < measures.length - 1; i++) {
+      const line = measures[i+1];
+      const prevLine = measures[i]
       const zone = this.getZone(line.position.x, line.position.y, annotationType);
       const bar = {
         x: [line.time - prevLine.time],
@@ -255,21 +265,22 @@ class ControllerExperience extends AbstractExperience {
       bars.push(bar);
     }
 
-    //legend
-    for (const zone of Object.keys(this.zoneColors[annotationType])) {
+    // legend
+    Object.keys(this.zoneColors[annotationType]).forEach((zone, i) => {
+      const tag = zone === 'center' ? 'center' : tagsOrder[i];
       const bar = {
         x: [0],
         orientation: 'h',
-        name: zone,
+        name: tag,
         marker: {
           color: this.zoneColors[annotationType][zone],
-          width: 1
+          width: 0
         },
         showlegend: true,
         type: 'bar'
       };
       bars.push(bar)
-    }
+    });
 
     const layout = {
       title: {
@@ -277,6 +288,12 @@ class ControllerExperience extends AbstractExperience {
         font: {
           size: 12,
         },
+      },
+      legend: {
+        font: {
+          color: '#FFFFFF',
+        },
+        bgcolor: "#232323"
       },
       barmode: 'stack',
       paper_bgcolor: '#000000',
@@ -289,7 +306,6 @@ class ControllerExperience extends AbstractExperience {
         pad: 0,
       }, 
     };
-    console.log(bars)
     Plotly.newPlot(this.graphInfo.container, bars, layout);
 
   };
