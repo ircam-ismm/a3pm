@@ -1,14 +1,14 @@
 import AnnotateBase from './AnnotateBase.js';
 import { html } from 'lit-html';
 
-import '@ircam/simple-components/sc-slider.js';
+// import '@ircam/simple-components/sc-slider.js';
 import { getSliderArea } from '../utils/annotation-area-position.js';
 
 export default class AnnotateSlider extends AnnotateBase {
   constructor(name, context) {
     super(name, context);
 
-    this.position = { x: 0 };
+    this.position = { x: 0.5 };
   }
 
   async enter() {

@@ -1,8 +1,9 @@
 import { AbstractExperience } from '@soundworks/core/client';
 import { render, html, nothing } from 'lit-html';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
-import '@ircam/simple-components/sc-button.js';
+// import '@ircam/simple-components/sc-button.js';
 import '@ircam/simple-components/sc-bang.js';
+import '@ircam/simple-components/sc-transport.js';
 import Plotly from 'plotly.js-dist';
 
 /**
@@ -28,6 +29,18 @@ class ControllerExperience extends AbstractExperience {
     this.graphHeight = 150;
 
     this.plotGraph = this.plotGraph.bind(this);
+
+    this.animSelectedTask = 1;
+    this.animAnnotationType = null;
+    this.animSelectedFile = null;
+    this.animationSelectedFilePath = null;
+    this.animationWidth = 500;
+    this.animationHeight = 500;
+    this.animationBg = {
+      square: "./images/square-bg.png",
+      triangle: "./images/triangle-bg.png",
+    }
+    this.$mediaPlayer = new Audio();
 
     this.graphCounter = 0;
     this.graphInfos = {};
@@ -62,12 +75,16 @@ class ControllerExperience extends AbstractExperience {
     this.globals = await this.client.stateManager.attach('globals');
     this.project = await this.client.stateManager.attach('project');
 
-    console.log(this.project.getValues());
+    console.log(this.project.getValues())
 
     this.client.socket.addListener('parsedData', e => {
       this.graphInfos[e.graphId].tagsOrder = e.tagsOrder;
       this.graphInfos[e.graphId].data = e.data;
       this.plotGraph(e.graphId);
+    });
+
+    this.client.socket.addListener('receiveDataAnim', e => {
+      this.animData = e;
     });
 
     this.client.stateManager.observe(async (schemaName, stateId) => {
@@ -76,7 +93,7 @@ class ControllerExperience extends AbstractExperience {
 
         participant.onDetach(() => {
           this.participants.delete(participant);
-          this.renderApp();
+          this.render();
         });
 
         let $packetFeedbackBang = null;
@@ -91,23 +108,47 @@ class ControllerExperience extends AbstractExperience {
             $packetFeedbackBang.active = true;
           }
 
-          this.renderApp();
+          this.render();
         });
 
         this.participants.add(participant);
-        this.renderApp();
+        this.render();
       }
     });
 
-    this.fileSystem.state.subscribe(() => this.renderApp());
+    this.fileSystem.state.subscribe(() => this.render());
 
 
-
+    // this.animationTask = 'task1';
+    // this.animationTaskType = this.project.
 
     // const measures = this.fileSystem.state.get('measures');
     // console.log(measures)
 
     window.addEventListener('resize', () => this.render());
+    this.render();
+
+    const $selectTaskAnimation = document.getElementById('select-task-animation');
+    const $selectFileAnimation = document.getElementById('select-file-animation');
+    this.animSelectedTask = $selectTaskAnimation.value;
+    this.animSelectedFile = $selectFileAnimation.value;
+    this.animChangeTask(this.animSelectedTask, this.animSelectedFile);
+    $selectTaskAnimation.addEventListener('change', e => {
+      if (e.target.value) {
+        this.animSelectedTask = e.target.value;
+        this.render();
+        this.animSelectedFile = $selectFileAnimation.value;
+        this.animChangeTask(this.animSelectedTask, this.animSelectedFile);
+      }
+    });
+    $selectFileAnimation.addEventListener('change', e => {
+      if (e.target.value) {
+        this.animSelectedFile = e.target.value;
+        this.animChangeTask(this.animSelectedTask, this.animSelectedFile);
+      }
+    })
+
+
     this.render();
   }
 
@@ -471,77 +512,140 @@ class ControllerExperience extends AbstractExperience {
     }
   }
 
-  getZone(x, y, annotationType) {
-    switch (annotationType) {
-      case 'slider':
-          if (x > 0.5) {
-            return 'right'
-          } else if (x < 0.5) {
-            return 'left'
-          } else {
-            return 'center'
+  animChangeTask(task, file) {
+    this.animData = null;
+
+    const $animCanvasBgCtx = document.querySelector("#animationCanvasBg").getContext("2d");
+    $animCanvasBgCtx.clearRect(0, 0, this.animationWidth, this.animationHeight);
+    const $animCanvas = document.querySelectorAll(".animationCanvas");
+    for (const $cv of $animCanvas) {
+      $cv.getContext("2d").clearRect(0, 0, this.animationWidth, this.animationHeight);
+    }
+    
+
+    // change background image
+    this.animAnnotationType = this.project.get('annotationType')[task - 1];
+    const animBgUrl = this.animationBg[this.animAnnotationType];
+    const img = new Image();   // Create new img element
+    img.onload = () => {
+      $animCanvasBgCtx.drawImage(img, 0, 0, this.animationWidth, this.animationHeight);
+    };
+    img.src = animBgUrl; // Set source path
+    // fetch sound file
+    const medias = this.fileSystem.state.get('medias');
+    const projectMediaFolder = this.project.get('mediaFolder');
+    const taskMediaFolder = projectMediaFolder[task-1];
+    const taskFiles = medias.children.find(el => el.name === taskMediaFolder);
+    const recordingFile = taskFiles.children.find(el => el.name === file);
+    this.animationSelectedFileUrl = recordingFile.url;
+    this.$mediaPlayer.src = this.animationSelectedFileUrl;
+    // fetch data
+    const animData = {};
+    const measures = this.fileSystem.state.get('measures');
+    for (const measureDir of measures.children) {
+      if (measureDir.type === 'directory') {
+        for (const taskDir of measureDir.children) {
+          if (taskDir.name === `task${task}`) {
+            for (const measureFile of taskDir.children) {
+              if (measureFile.name.includes(file)) {
+                animData[measureDir.name] = { 
+                  path: measureFile.path,
+                  drawIndex: 0,
+                  timer: null,
+                };
+              }
+            }
           }
+        }
+      }
+    }
+    this.client.socket.send('getAnnotations', animData);
+
+  }
+
+  setupAnim() {
+    const $animCanvas = document.querySelectorAll(".animationCanvas");
+    for (const $cv of $animCanvas) {
+      $cv.getContext("2d").clearRect(0, 0, this.animationWidth, this.animationHeight);
+    }
+
+    this.animSelectedParticipants = [];
+    const participantCheckboxes = document.getElementsByName("anim-participant");
+    for (const box of participantCheckboxes) {
+      if (box.checked) {
+        this.animSelectedParticipants.push(box.value);
+      }
+    }
+
+    for (const name of this.animSelectedParticipants) {
+      this.animDrawMeasure(name);
+    }
+  
+  }
+
+  animDrawMeasure(name) {
+    const $animCanvasCtx = document.querySelector(`#animationCanvas-${name}`).getContext("2d");
+    $animCanvasCtx.clearRect(0, 0, this.animationWidth, this.animationHeight);
+    $animCanvasCtx.font = '16px sans-serif';
+
+    const participantData = this.animData[name];
+    const drawIndex = participantData.drawIndex;
+    const point = participantData.data[drawIndex];
+    if (this.animAnnotationType === 'slider') {
+      const idxParticipant = this.animSelectedParticipants.indexOf(name);
+      $animCanvasCtx.fillText(name.split('-')[2], 20, 20 + 100 * idxParticipant);
+      $animCanvasCtx.beginPath();
+      $animCanvasCtx.rect(20, 40 + 100 * idxParticipant, this.animationWidth - 20, 50);
+      $animCanvasCtx.strokeStyle = 'white';
+      $animCanvasCtx.stroke();
+      $animCanvasCtx.beginPath();
+      $animCanvasCtx.rect(20, 40 + 100 * idxParticipant, (this.animationWidth-40) * point.position.x, 50);
+      $animCanvasCtx.fillStyle = 'white';
+      $animCanvasCtx.fill();
+    } else {
+      $animCanvasCtx.beginPath();
+      $animCanvasCtx.arc(this.animationWidth/2 * (1-point.position.x), this.animationHeight/2*(1-point.position.y), 7, 0, 2 * Math.PI);
+      $animCanvasCtx.fillStyle = 'white';
+      $animCanvasCtx.fill();
+    }
+    this.animData[name].drawIndex++;
+
+    if (drawIndex < participantData.numPoints-1) {
+      const currTime = point.time;
+      const nextTime = this.animData[name].data[drawIndex + 1].time;
+
+
+      this.animData[name].timer = setTimeout(() => {
+        this.animDrawMeasure(name);
+      }, (nextTime - currTime) * 1000);
+    }
+    
+  }
+
+  
+
+
+  animationTransport(state) {
+    switch (state) {
+      case 'play':
+        if (this.animData) {
+          this.setupAnim();
+          this.$mediaPlayer.play();
+        }
         break;
-      case 'square':
-        const size = 1020
-        const ellipses = {
-          'top': {
-            'xRad': 422 / size,
-            'yRad': 368 / size
-          },
-          'right': {
-            'xRad': 366 / size,
-            'yRad': 366 / size
-          },
-          'bottom': {
-            'xRad': 422 / size,
-            'yRad': 368 / size
-          },
-          'left': {
-            'xRad': 391 / size,
-            'yRad': 368 / size
-          },
+      case 'pause':
+        for (const el of Object.values(this.animData)) {
+          clearTimeout(el.timer);
         }
-        ellipses['top']['xC'] = 0
-        ellipses['top']['yC'] = 1 - ellipses['top']['yRad']
-        ellipses['right']['xC'] = 1 - ellipses['right']['xRad']
-        ellipses['right']['yC'] = 0
-        ellipses['bottom']['xC'] = 0
-        ellipses['bottom']['yC'] = -1 + ellipses['bottom']['yRad']
-        ellipses['left']['xC'] = -1 + ellipses['left']['xRad']
-        ellipses['left']['yC'] = 0
-        for (const pos of ['top', 'right', 'bottom', 'left']) {
-        const  inEllipse = ((x - ellipses[pos]['xC']) ** 2 / ellipses[pos]['xRad'] ** 2) + ((y - ellipses[pos]['yC']) ** 2 / ellipses[pos]['yRad'] ** 2) < 1
-          if (inEllipse) {
-            return pos
-          }
-        }
-        return 'center' 
+        this.$mediaPlayer.pause();
         break;
-      case 'triangle': 
-        // Positions of each vertex(top, bottom right, bottom left)
-        const vertices = {
-          top: {
-            x: 0,
-            y: 1,
-          },
-          left: {
-            x: -0.88,
-            y: -0.47,
-          },
-          right: {
-            x: 0.88,
-            y: -0.47,
-          }
+      case 'stop':
+        for (const el of Object.values(this.animData)) {
+          clearTimeout(el.timer);
+          el.drawIndex = 0;
         }
-        const thresh = 0.75
-        for (const pos of ['top', 'left', 'right']) {
-          const norm = Math.sqrt((x - vertices[pos].x)**2 + (y - vertices[pos].y)**2);
-          if (norm < thresh) {
-            return pos;
-          }
-        }
-        return 'center'
+        this.$mediaPlayer.pause();
+        this.$mediaPlayer.currentTime = 0;
         break;
     }
   }
@@ -553,6 +657,21 @@ class ControllerExperience extends AbstractExperience {
     const recordingsOverview = medias.children;
     const participants = Array.from(this.participants).map(p => p.getValues());
     const project = this.project.getValues();
+    const measures = this.fileSystem.state.get('measures');
+    const animMediaDir = project.mediaFolder[this.animSelectedTask-1];
+    let animMediaFiles;
+    for (const mediaDir of medias.children) {
+      if (mediaDir.name === animMediaDir) {
+        animMediaFiles = mediaDir.children;
+      }
+    }
+    const measuresNames = [];
+    for (const el of measures.children) {
+      if (el.type === 'directory') {
+        measuresNames.push(el.name);
+      }
+    }
+
 
     render(html`
       <header>
@@ -641,6 +760,110 @@ class ControllerExperience extends AbstractExperience {
               text="add graph"
               @input="${e => {this.addGraph()}}"
             ></sc-button
+          </div>
+          
+        </div>
+
+        <div
+          style="
+            width: 100%;
+            clear: both;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid white;
+          "
+        >
+          <h2># animation</h2>
+          <div
+            id="animation-container"
+            style="
+             position: relative;
+             width: 100%;
+             height: ${this.graphHeight}px;
+             display: flex;
+            "
+            align="center"
+          >
+            <div style="width: 20%">
+              <div style="
+                  display: flex;
+                  flex-direction: column;
+                  flex-wrap: wrap;
+                "
+              >
+                task:
+                <select id="select-task-animation" style="margin-bottom: 20px; width: ">
+                  ${Array(project.numTasks).fill(0).map((x, i) => {
+                    return html`<option value="${i+1}">task${i+1}</option>`
+                  })}
+                </select> 
+                file: 
+                <select id="select-file-animation" style="margin-bottom: 20px;">
+                  ${animMediaFiles.map((x, i) => {
+                    return html`<option value="${x.name}">${x.name}</option>`
+                  })}
+                </select> 
+              </div>
+
+              <div>
+                <fieldset id="anim-selected-participants">
+                  <legend>Participants</legend>
+                  ${measures.children.map(el => {
+                    if (el.type === 'directory') {
+                      return html`
+                        <div style="display: flex; align-items: center">
+                          <div style="margin-right: 10px;">
+                            <input type="checkbox" name="anim-participant" value="${el.name}" />
+                          </div>
+                          <label for="${el.name}">${el.name.split('-')[2]}</label>
+                        </div>
+                      `
+                    }
+                  })}
+                </fieldset>
+              </div>
+            </div>
+
+            <div style="margin-left: 30px;">
+              <sc-transport
+                buttons="[play, pause, stop]"
+                @change="${e => this.animationTransport(e.detail.value)}"
+              >
+              </sc-transport>
+
+
+              <div style="position: relative">
+                <canvas 
+                  id="animationCanvasBg" 
+                  width="${this.animationWidth}" 
+                  height="${this.animationHeight}"
+                  style="
+                    position: absolute; 
+                    left: 0; 
+                    top: 0
+                  "
+                >
+                </canvas>
+                ${measuresNames.map(name => {
+                  return html`
+                    <canvas
+                      class="animationCanvas"
+                      id="animationCanvas-${name}"
+                      width="${this.animationWidth}"
+                      height="${this.animationHeight}"
+                      style="
+                        position: absolute; 
+                        left: 0; 
+                        top: 0
+                      "
+                    >
+                    </canvas>
+                  `
+                })}
+                
+              </div>
+            </div>
+
           </div>
           
         </div>

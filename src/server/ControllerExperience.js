@@ -1,6 +1,7 @@
 import { AbstractExperience } from '@soundworks/core/server';
 import fs from 'fs';
 import readline from 'readline';
+import { async } from 'regenerator-runtime';
 
 class PlayerExperience extends AbstractExperience {
   constructor(server, clientTypes, options = {}) {
@@ -15,6 +16,33 @@ class PlayerExperience extends AbstractExperience {
 
   enter(client) {
     super.enter(client);
+
+    client.socket.addListener('getAnnotations', async data => {
+      
+      const readData = data;
+
+      for (const key of Object.keys(data)) {
+        const parsed = [];
+
+        var rdMeasures = readline.createInterface({
+          input: fs.createReadStream(data[key].path),
+          output: process.stdout,
+          console: false
+        });
+
+        
+
+        for await (const line of rdMeasures) {
+          parsed.push(JSON.parse(line));
+        }
+
+        readData[key].data = parsed;
+        readData[key].numPoints = parsed.length;
+      }
+
+      client.socket.send('receiveDataAnim', readData);
+
+    })
 
     client.socket.addListener('getGraph', async data => {
       // console.log(path);
