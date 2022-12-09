@@ -97,7 +97,7 @@ server.router.use('vendors', serveStatic(path.join('.vendors', 'public')));
 
   Object.keys(ifaces).forEach(dev => {
     ifaces[dev].forEach(details => {
-      if (address !== null) {
+      if (details.address !== '10.10.0.1' &&  address !== null) {
         return;
       }
 
