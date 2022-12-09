@@ -66,6 +66,22 @@ class ControllerExperience extends AbstractExperience {
       },
     }; 
 
+    this.rotSym = {
+      slider: {
+        normal: 1,
+        sym: -1 
+      },
+      triangle: {
+        normal: [[1, 0],[0, 1]],
+        rot120: [[-0.5, - Math.sqrt(3) / 2], [Math.sqrt(3)/2, -0.5]], 
+        rot240: [[-0.5, Math.sqrt(3) / 2], [- Math.sqrt(3) / 2, -0.5]],
+        symTop: [[1, 0], [0, -1]],
+        rot120SymTop: [[-0.5, Math.sqrt(3) / 2], [Math.sqrt(3) / 2, 0.5]],
+        rot240SymTop: [[-0.5, -Math.sqrt(3) / 2], [- Math.sqrt(3) / 2, 0.5]]
+      } 
+    } 
+
+
     renderInitializationScreens(client, config, $container);
   }
 
@@ -735,38 +751,12 @@ class ControllerExperience extends AbstractExperience {
           })}
         </div>
 
-        <div id="graphs-container"
-          style="
-            width: 100%;
-            clear: both;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid white;
-          "
-        >
-          <h2># graphs</h2>
-          <div 
-            id="empty-graph"
-            style="
-             position: relative;
-             width: 90%;
-             height: ${this.graphHeight}px;
-            "
-            align="center"
-          >
-            <sc-button
-              id="add-button"
-              style="margin:0 auto;"
-              text="add graph"
-              @input="${e => {this.addGraph()}}"
-            ></sc-button
-          </div>
-          
-        </div>
+        
 
         <div
           style="
             width: 100%;
+            height: ${this.animationHeight}px;
             clear: both;
             margin-top: 20px;
             padding-top: 20px;
@@ -864,6 +854,36 @@ class ControllerExperience extends AbstractExperience {
               </div>
             </div>
 
+          </div>
+          
+        </div>
+
+
+        <div id="graphs-container"
+          style="
+            width: 100%;
+            clear: both;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid white;
+          "
+        >
+          <h2># graphs</h2>
+          <div
+            id="empty-graph"
+            style="
+             position: relative;
+             width: 90%;
+             height: ${this.graphHeight}px;
+            "
+            align="center"
+          >
+            <sc-button
+              id="add-button"
+              style="margin:0 auto;"
+              text="add graph"
+              @input="${e => { this.addGraph() }}"
+            ></sc-button
           </div>
           
         </div>
