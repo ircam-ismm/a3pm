@@ -22,25 +22,40 @@ class PlayerExperience extends AbstractExperience {
       const readData = data;
 
       for (const key of Object.keys(data)) {
-        const parsed = [];
+        if (!(data[key].path.measures)) {
+          delete data[key];
+        } else {
+          // fetch tags order
+          let tagsOrder;
+          let fileContent = fs.readFileSync(data[key].path.metas, { encoding: 'utf8' });
+          fileContent = fileContent.replace(/\n/, '');
+          tagsOrder = fileContent.split(': ')[1].split(','); // better remove space with regexp ?
 
-        var rdMeasures = readline.createInterface({
-          input: fs.createReadStream(data[key].path),
-          output: process.stdout,
-          console: false
-        });
+          //fetch measures
+          const parsed = [];
 
-        
+          var rdMeasures = readline.createInterface({
+            input: fs.createReadStream(data[key].path.measures),
+            output: process.stdout,
+            console: false
+          });
 
-        for await (const line of rdMeasures) {
-          parsed.push(JSON.parse(line));
+
+
+          for await (const line of rdMeasures) {
+            parsed.push(JSON.parse(line));
+          }
+
+          readData[key].tagsOrder = tagsOrder;
+          readData[key].data = parsed;
+          readData[key].numPoints = parsed.length;
         }
 
-        readData[key].data = parsed;
-        readData[key].numPoints = parsed.length;
       }
+        
 
       client.socket.send('receiveDataAnim', readData);
+
 
     })
 
@@ -51,7 +66,8 @@ class PlayerExperience extends AbstractExperience {
       
       // fetch tags order
       let tagsOrder;
-      const fileContent = fs.readFileSync(data.filesPath.metas, {encoding: 'utf8'});
+      let fileContent = fs.readFileSync(data.filesPath.metas, {encoding: 'utf8'});
+      fileContent = fileContent.replace(/\n/, '')
       tagsOrder = fileContent.split(': ')[1].split(','); // better remove space with regexp ?
 
 

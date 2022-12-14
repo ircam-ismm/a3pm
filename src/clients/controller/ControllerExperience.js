@@ -1,10 +1,11 @@
 import { AbstractExperience } from '@soundworks/core/client';
-import { render, html, nothing } from 'lit-html';
+import { render, html, nothing } from 'lit';
 import renderInitializationScreens from '@soundworks/template-helpers/client/render-initialization-screens.js';
-// import '@ircam/simple-components/sc-button.js';
+import '@ircam/simple-components/sc-button.js';
 import '@ircam/simple-components/sc-bang.js';
 import '@ircam/simple-components/sc-transport.js';
 import Plotly from 'plotly.js-dist';
+import getTransform from './rot';
 
 /**
  * @todo: 
@@ -66,22 +67,6 @@ class ControllerExperience extends AbstractExperience {
       },
     }; 
 
-    this.rotSym = {
-      slider: {
-        normal: 1,
-        sym: -1 
-      },
-      triangle: {
-        normal: [[1, 0],[0, 1]],
-        rot120: [[-0.5, - Math.sqrt(3) / 2], [Math.sqrt(3)/2, -0.5]], 
-        rot240: [[-0.5, Math.sqrt(3) / 2], [- Math.sqrt(3) / 2, -0.5]],
-        symTop: [[1, 0], [0, -1]],
-        rot120SymTop: [[-0.5, Math.sqrt(3) / 2], [Math.sqrt(3) / 2, 0.5]],
-        rot240SymTop: [[-0.5, -Math.sqrt(3) / 2], [- Math.sqrt(3) / 2, 0.5]]
-      } 
-    } 
-
-
     renderInitializationScreens(client, config, $container);
   }
 
@@ -101,6 +86,14 @@ class ControllerExperience extends AbstractExperience {
 
     this.client.socket.addListener('receiveDataAnim', e => {
       this.animData = e;
+      for (const key of Object.keys(this.animData)) {
+        const projTags = this.project.get('tags');
+        const taskTags = projTags[this.animSelectedTask-1];
+        const refOrder = taskTags[0];
+        const order = this.animData[key].tagsOrder;
+        const transform = getTransform(this.animAnnotationType, order, refOrder);
+        this.animData[key].transform = transform;
+      }
     });
 
     this.client.stateManager.observe(async (schemaName, stateId) => {
@@ -528,9 +521,16 @@ class ControllerExperience extends AbstractExperience {
     }
   }
 
+  scaleCanvas(u) {
+    const [x,y] = u;
+    return [(1+x)*this.animationWidth/2, (1-y)*this.animationHeight/2];
+  }
+
   animChangeTask(task, file) {
     this.animData = null;
 
+    const $animCanvasTagsCtx = document.querySelector("#animationCanvasTags").getContext("2d");
+    $animCanvasTagsCtx.clearRect(0, 0, this.animationWidth+200, this.animationHeight);
     const $animCanvasBgCtx = document.querySelector("#animationCanvasBg").getContext("2d");
     $animCanvasBgCtx.clearRect(0, 0, this.animationWidth, this.animationHeight);
     const $animCanvas = document.querySelectorAll(".animationCanvas");
@@ -538,7 +538,6 @@ class ControllerExperience extends AbstractExperience {
       $cv.getContext("2d").clearRect(0, 0, this.animationWidth, this.animationHeight);
     }
     
-
     // change background image
     this.animAnnotationType = this.project.get('annotationType')[task - 1];
     const animBgUrl = this.animationBg[this.animAnnotationType];
@@ -547,6 +546,38 @@ class ControllerExperience extends AbstractExperience {
       $animCanvasBgCtx.drawImage(img, 0, 0, this.animationWidth, this.animationHeight);
     };
     img.src = animBgUrl; // Set source path
+    // draw tags
+    const tags = this.project.get('tags')[task-1][0];
+    $animCanvasTagsCtx.font = '16px sans-serif';
+    $animCanvasTagsCtx.fillStyle = "white";
+    switch (this.animAnnotationType) {
+      case 'slider': {
+        const widthTagLeft = $animCanvasTagsCtx.measureText(tags[0]).width;
+        $animCanvasTagsCtx.fillText(tags[0], 95-widthTagLeft, 60); // canvas tags 200px larger
+        $animCanvasTagsCtx.fillText(tags[1], this.animationWidth + 110, 60); // canvas tags 200px larger
+      }
+        break;
+      case 'triangle': {
+        const [xTop, yTop] = this.scaleCanvas([0.1, 0.9]);
+        const [xRight, yRight] = this.scaleCanvas([0.7, -0.6]);
+        const [xLeft, yLeft] = this.scaleCanvas([-0.9, -0.6]);
+        $animCanvasTagsCtx.fillText(tags[0], xTop + 100, yTop); // canvas tags 200px larger
+        $animCanvasTagsCtx.fillText(tags[1], xRight + 100, yRight);
+        $animCanvasTagsCtx.fillText(tags[2], xLeft + 100, yLeft);
+        break;
+      }
+      case 'square': {
+        const [xTop, yTop] = this.scaleCanvas([0.13, 0.9]);
+        const [xRight, yRight] = this.scaleCanvas([0.9, -0.2]);
+        const [xBottom, yBottom] = this.scaleCanvas([0.17, -0.9]);
+        const [xLeft, yLeft] = this.scaleCanvas([-1.3, -0.2]);
+        $animCanvasTagsCtx.fillText(tags[0], xTop + 100, yTop);
+        $animCanvasTagsCtx.fillText(tags[1], xRight + 100, yRight);
+        $animCanvasTagsCtx.fillText(tags[2], xBottom + 100, yBottom);
+        $animCanvasTagsCtx.fillText(tags[3], xLeft + 100, yLeft);
+        break;
+      }
+    }
     // fetch sound file
     const medias = this.fileSystem.state.get('medias');
     const projectMediaFolder = this.project.get('mediaFolder');
@@ -560,15 +591,21 @@ class ControllerExperience extends AbstractExperience {
     const measures = this.fileSystem.state.get('measures');
     for (const measureDir of measures.children) {
       if (measureDir.type === 'directory') {
+        const $colorPicker = document.querySelector(`#anim-color-${measureDir.name}`);
+        animData[measureDir.name] = {
+          drawIndex: 0,
+          timer: null,
+          path: {},
+          color: $colorPicker.value
+        };
         for (const taskDir of measureDir.children) {
           if (taskDir.name === `task${task}`) {
-            for (const measureFile of taskDir.children) {
-              if (measureFile.name.includes(file)) {
-                animData[measureDir.name] = { 
-                  path: measureFile.path,
-                  drawIndex: 0,
-                  timer: null,
-                };
+            for (const textFile of taskDir.children) {
+              if (textFile.name.includes('task-metas')) {
+                animData[measureDir.name].path.metas = textFile.path;
+              }
+              if (textFile.name.includes(file)) {
+                animData[measureDir.name].path.measures = textFile.path;
               }
             }
           }
@@ -576,8 +613,9 @@ class ControllerExperience extends AbstractExperience {
       }
     }
     this.client.socket.send('getAnnotations', animData);
-
   }
+
+
 
   setupAnim() {
     const $animCanvas = document.querySelectorAll(".animationCanvas");
@@ -596,46 +634,50 @@ class ControllerExperience extends AbstractExperience {
     for (const name of this.animSelectedParticipants) {
       this.animDrawMeasure(name);
     }
-  
   }
+
 
   animDrawMeasure(name) {
     const $animCanvasCtx = document.querySelector(`#animationCanvas-${name}`).getContext("2d");
     $animCanvasCtx.clearRect(0, 0, this.animationWidth, this.animationHeight);
     $animCanvasCtx.font = '16px sans-serif';
-
     const participantData = this.animData[name];
     const drawIndex = participantData.drawIndex;
+    const transform = participantData.transform;
     const point = participantData.data[drawIndex];
     if (this.animAnnotationType === 'slider') {
+      const pointTrans = transform([point.position.x]);
       const idxParticipant = this.animSelectedParticipants.indexOf(name);
+      $animCanvasCtx.fillStyle = 'white';
       $animCanvasCtx.fillText(name.split('-')[2], 20, 20 + 100 * idxParticipant);
+      $animCanvasCtx.fillStyle = participantData.color ? participantData.color : 'white';
+      $animCanvasCtx.strokeStyle = 'white';
       $animCanvasCtx.beginPath();
       $animCanvasCtx.rect(20, 40 + 100 * idxParticipant, this.animationWidth - 20, 50);
-      $animCanvasCtx.strokeStyle = 'white';
       $animCanvasCtx.stroke();
       $animCanvasCtx.beginPath();
-      $animCanvasCtx.rect(20, 40 + 100 * idxParticipant, (this.animationWidth-40) * point.position.x, 50);
-      $animCanvasCtx.fillStyle = 'white';
+      $animCanvasCtx.rect(20, 40 + 100 * idxParticipant, (this.animationWidth - 40) * pointTrans[0], 50);
       $animCanvasCtx.fill();
     } else {
+      const pointTrans = transform([point.position.x, point.position.y]);
+      $animCanvasCtx.fillStyle = participantData.color ? participantData.color : 'white';
+      $animCanvasCtx.strokeStyle = 'black';
       $animCanvasCtx.beginPath();
-      $animCanvasCtx.arc(this.animationWidth/2 * (1-point.position.x), this.animationHeight/2*(1-point.position.y), 7, 0, 2 * Math.PI);
-      $animCanvasCtx.fillStyle = 'white';
+      $animCanvasCtx.arc(this.animationWidth / 2 * (1 + pointTrans[0]), this.animationHeight / 2 * (1 - pointTrans[1]), 7, 0, 2 * Math.PI);
+      $animCanvasCtx.stroke();
+      $animCanvasCtx.beginPath();
+      $animCanvasCtx.arc(this.animationWidth / 2 * (1 + pointTrans[0]), this.animationHeight / 2 * (1 - pointTrans[1]), 7, 0, 2 * Math.PI);
       $animCanvasCtx.fill();
     }
     this.animData[name].drawIndex++;
-
     if (drawIndex < participantData.numPoints-1) {
       const currTime = point.time;
       const nextTime = this.animData[name].data[drawIndex + 1].time;
-
 
       this.animData[name].timer = setTimeout(() => {
         this.animDrawMeasure(name);
       }, (nextTime - currTime) * 1000);
     }
-    
   }
 
   
@@ -687,6 +729,8 @@ class ControllerExperience extends AbstractExperience {
         measuresNames.push(el.name);
       }
     }
+
+    
 
 
     render(html`
@@ -753,12 +797,14 @@ class ControllerExperience extends AbstractExperience {
 
         
 
+        <!-- animation -->
         <div
           style="
             width: 100%;
             height: ${this.animationHeight}px;
             clear: both;
             margin-top: 20px;
+            margin-bottom: 100px;
             padding-top: 20px;
             border-top: 1px solid white;
           "
@@ -794,7 +840,8 @@ class ControllerExperience extends AbstractExperience {
                   })}
                 </select> 
               </div>
-
+              
+              <!-- participant selector -->
               <div>
                 <fieldset id="anim-selected-participants">
                   <legend>Participants</legend>
@@ -803,9 +850,30 @@ class ControllerExperience extends AbstractExperience {
                       return html`
                         <div style="display: flex; align-items: center">
                           <div style="margin-right: 10px;">
-                            <input type="checkbox" name="anim-participant" value="${el.name}" />
+                            <input 
+                              type="checkbox" 
+                              name="anim-participant" 
+                              value="${el.name}" 
+                            />
                           </div>
-                          <label for="${el.name}">${el.name.split('-')[2]}</label>
+                          <label for="${el.name}">
+                            ${el.name.split('-')[2]}
+                          </label>
+                          <div style="width: 30px; margin-left: 10px;">
+                            <input 
+                              id="anim-color-${el.name}"
+                              type="color" 
+                              name="color" 
+                              value="#ffffff" 
+                              style="
+                                height: 20px;
+                                width: 40px
+                              "
+                              @input="${e => {
+                                this.animData[el.name].color = e.target.value;
+                              }}"
+                            />
+                          </div>
                         </div>
                       `
                     }
@@ -823,13 +891,24 @@ class ControllerExperience extends AbstractExperience {
 
 
               <div style="position: relative">
+                <canvas
+                  id="animationCanvasTags"
+                  width="${this.animationWidth+200}" 
+                  height="${this.animationHeight}"
+                  style="
+                    position: absolute; 
+                    left: 0; 
+                    top: 0
+                  "
+                >
+                </canvas>
                 <canvas 
                   id="animationCanvasBg" 
                   width="${this.animationWidth}" 
                   height="${this.animationHeight}"
                   style="
                     position: absolute; 
-                    left: 0; 
+                    left: 100px; 
                     top: 0
                   "
                 >
@@ -843,7 +922,7 @@ class ControllerExperience extends AbstractExperience {
                       height="${this.animationHeight}"
                       style="
                         position: absolute; 
-                        left: 0; 
+                        left: 100px; 
                         top: 0
                       "
                     >

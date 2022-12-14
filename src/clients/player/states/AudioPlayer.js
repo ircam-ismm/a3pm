@@ -1,5 +1,5 @@
 import State from './State.js';
-import { html } from 'lit-html';
+import { html } from 'lit';
 import '@ircam/simple-components/sc-number.js';
 
 export default class AudioPlayer extends State {

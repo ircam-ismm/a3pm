@@ -1,5 +1,5 @@
 import State from './State.js';
-import { html } from 'lit-html';
+import { html } from 'lit';
 import slugify from 'slugify';
 
 export function pad(prefix, radical) {

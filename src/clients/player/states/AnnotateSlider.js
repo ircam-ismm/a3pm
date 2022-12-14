@@ -1,7 +1,7 @@
 import AnnotateBase from './AnnotateBase.js';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
-// import '@ircam/simple-components/sc-slider.js';
+import '@ircam/simple-components/sc-slider.js';
 import { getSliderArea } from '../utils/annotation-area-position.js';
 
 export default class AnnotateSlider extends AnnotateBase {
@@ -46,7 +46,7 @@ export default class AnnotateSlider extends AnnotateBase {
         height="${sliderHeight}"
         min="0"
         max="1"
-        value="${this.position}"
+        value="${this.position.x}"
         @input="${e => this.setPosition(e.detail.value)}"
       ></sc-slider>
       <span

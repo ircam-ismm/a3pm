@@ -1,5 +1,5 @@
 import AnnotateBase from './AnnotateBase.js';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 import { getCircleArea } from '../utils/annotation-area-position.js';
 

@@ -1,5 +1,5 @@
 import State from './State.js';
-import { html } from 'lit-html';
+import { html } from 'lit';
 
 export default class StartTask extends State {
 
