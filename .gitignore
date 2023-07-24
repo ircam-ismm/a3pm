@@ -1,0 +1,33 @@
+# transpiled files and dependencies
+/node_modules
+/public/vendors
+# ignore all config except default
+/config/env/*
+!/config/env/default.json
+!/config/env/prod.json
+
+# application instance specific
+.build
+.data
+.vendors
+
+# junk files
+package-lock.json
+.DS_Store
+Thumbs.db
+
+audio-files/*
+!audio-files/.gitkeep
+measures/*
+!measures/.gitkeep
+
+_resources
+
+/network/bin/
+/network/log/
+/network/dnsmasq.leases
+
+/projects/*
+!/projects/test-*
+/projects/*/measures
+/projects/*/medias

@@ -1,0 +1,15 @@
+{
+  name: 'a3pm_v2',
+  author: '',
+  clients: {
+    player: {
+      target: 'browser',
+      default: true,
+    },
+    controller: {
+      target: 'browser',
+    },
+  },
+
+  project: 'test',
+}
