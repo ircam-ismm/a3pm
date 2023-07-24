@@ -1,0 +1,33 @@
+{
+  name: 'projet test',
+  language: 'fr',
+  tasks: [
+    {
+      annotationType: 'slider',
+      mediaType: 'audio',
+      mediaFolder: 'task1',
+      instruction: "slider",
+      tags: [
+        ['pas de tension', 'très forte tension'],
+      ],
+    },
+    {
+      annotationType: 'triangle',
+      mediaType: 'audio',
+      mediaFolder: 'task2',
+      instruction: "triangle",
+      tags: [
+        ['un', 'très long texte pour', 'tester'],
+      ],
+    },
+    {
+      annotationType: 'square',
+      mediaType: 'audio',
+      mediaFolder: 'task1',
+      instruction: "square",
+      tags: [
+        ['un', 'très long texte pour', 'tester si ça marche', 'bien'],
+      ],
+    },
+  ],
+}
