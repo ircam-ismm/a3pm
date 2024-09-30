@@ -254,10 +254,12 @@ class SwAnim extends LitElement {
       if (taskDir) {
         const metasFile = taskDir.children.find(e => e.name.includes('task-metas'));
         const measuresFile = taskDir.children.find(e => e.name.includes(file));
-        animData[measureFolder.name].path = {
-          metas: metasFile.path,
-          measures: measuresFile.path,
-        };
+        if (measuresFile) {
+          animData[measureFolder.name].path = {
+            metas: metasFile.path,
+            measures: measuresFile.path,
+          };
+        }
       }
     }
     this.controller.set({ getAnimationRequest: animData });

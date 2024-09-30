@@ -316,3 +316,24 @@ server.stateManager.observe(async (schemaName, stateId, nodeId) => {
 });
  
 
+/*
+const participants = await server.stateManager.getCollection('participant');
+
+server.stateManager.onUpdateHook('project', (updates) => {
+  // split in two command
+  // - forceTaskIndex -> pass all participants on AnnotateIdle
+  // - startTask (event)
+  //    -> pass all particpants on AnnotateTask
+  //    -> record start time
+  //    -> send OSC message -> launch media (even if media is a person)
+
+  if ('forceTaskIndex' in updates) {
+    const currentTaskIndex = updates['forceTaskIndex'];
+    const currentTaskIndexStartTime = syncPlugin.getSyncTime();
+
+    participants.set({ currentTaskIndex, currentTaskIndexStartTime });
+
+    // send OSC msg
+  }
+});
+*/

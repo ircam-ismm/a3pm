@@ -11,7 +11,7 @@ export default {
     default: null,
     event: true,
   },
-  getAnimationRequest: {
+  getAnimationRequest: {
     type: 'any',
     nullable: true,
     default: null,
@@ -23,4 +23,4 @@ export default {
     default: null,
     event: true,
   },
-}
+};

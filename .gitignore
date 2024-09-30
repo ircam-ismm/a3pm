@@ -28,6 +28,6 @@ _resources
 /network/dnsmasq.leases
 
 /projects/*
-!/projects/test-*
+!/projects/test-*/
 /projects/*/measures
 /projects/*/medias
